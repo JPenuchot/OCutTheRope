@@ -1,7 +1,7 @@
 OCB_FLAGS = -use-ocamlfind
 OCB = 		ocamlbuild $(OCB_FLAGS)
 
-all: 		native byte debug # profile debug
+all: 		native byte # test # profile debug
 
 clean:
 			$(OCB) -clean
