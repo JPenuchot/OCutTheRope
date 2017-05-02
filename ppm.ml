@@ -1,4 +1,6 @@
-open Graphics 
+open Graphics
+
+let transpcol = rgb 18 52 86
 
 let image_from_ppm n = 
   let e = open_in_bin n in
@@ -13,16 +15,19 @@ let image_from_ppm n =
   for i = 0 to h - 1 do
     for j = 0 to w - 1 do
       let r, g, b =
-	if is_bw  then
-	  let x = input_byte e in 
-	  x, x, x
-	else
-	  let r = input_byte e in
-	  let g = input_byte e in
-	  let b = input_byte e in
-	  r, g, b
-      in
-      m.(i).(j) <- rgb r g b
+	       if is_bw  then
+	         let x = input_byte e in 
+	         x, x, x
+	       else
+	         let r = input_byte e in
+	         let g = input_byte e in
+	         let b = input_byte e in
+	         r, g, b
+              in
+              m.(i).(j) <- if rgb r g b == transpcol then
+                  transp
+                else
+                  rgb r g b
     done
   done ;
   close_in e ;
