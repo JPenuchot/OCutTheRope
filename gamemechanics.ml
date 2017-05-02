@@ -5,4 +5,4 @@
  *	physics stuff and render.ml to render stuff.
  *)
 
-type GameObject =
+(*type GameObject =*)

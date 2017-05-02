@@ -14,14 +14,14 @@ type vector =
 		|   For of float * float
 
 let gravity = Acc(0., -0.9)
-
+(*
 let sum_forces lst_f =
 	let rec sf lst_f (xa, ya) =
 		match lst_f with
-		| For(x, y)::tl -> sf tl For(xa +. x, ya +. y)
+		| For(x, y)::tl -> sf tl For((xa +. x), (ya +. y))
 		| [] -> For(xa, ya)
 	in sf lst_f For(0., 0.)
-
+*)
 (*let apply_force*)
 
 (*let apply_speed*)
