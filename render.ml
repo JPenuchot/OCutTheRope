@@ -16,6 +16,8 @@ let () = open_graph " 500x700";
 auto_synchronize false
 
 (* Load pictures *)
+let background =
+	image_from_ppm "sprites/background.ppm"
 let player_sprite =
 	image_from_ppm "sprites/player.ppm"
 let bubble_sprite =
@@ -45,6 +47,8 @@ let draw_single_element element =
 let draw_level level =
 	(* Clear old drawing *)
 	clear_graph();
+	(* Draw background *)
+	draw_image background 0 0;
 	(* Internal function to draw the elements of a gameElement list *)
 	let rec draw_elements elementsList =
 		match elementsList with
