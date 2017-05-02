@@ -1,22 +1,26 @@
 OCB_FLAGS = -use-ocamlfind
 OCB = 		ocamlbuild $(OCB_FLAGS)
 
-all: 		native byte # test # profile debug
+all: 		native # test # profile debug
 
 clean:
 			$(OCB) -clean
 
 native:
-			$(OCB) main.native
+			$(OCB) game.native
+			$(OCB) editor.native
 
 byte:
-			$(OCB) main.byte
+			$(OCB) game.byte
+			$(OCB) editor.byte
 
 profile:
-			$(OCB) -tag profile main.native
+			$(OCB) -tag profile game.native
+			$(OCB) -tag profile editor.native
 
 debug:
-			$(OCB) -tag debug main.byte
+			$(OCB) -tag debug game.byte
+			$(OCB) -tag debug editor.byte
 
 test: 		
 	$(OCB) -tag debug test.byte
