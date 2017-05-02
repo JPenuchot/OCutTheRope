@@ -9,20 +9,17 @@
  *)
 
 let gravity = (0., -0.9)
-let dt = .1
+let dt = 0.1
 
 let sum_forces lst_f =
-	let rec sf lst_f (xa, ya) =
+	let rec sf lst_f (xf, yf) =
 		match lst_f with
-		| (x, y)::tl -> sf tl (xa +. x, ya +. y)
-		| [] -> (xa, ya)
+		| (x, y)::tl -> sf tl (xf +. x, yf +. y)
+		| [] -> (xf, yf)
 	in sf lst_f (0., 0.)
 
 let force_to_acc (xf, yf) mass =
 	(xf /. mass, yf /. mass)
 
-let apply_acc (xv, yv) (xa, ya) =
-	(xv +. (dt *. xa), yv +. (dt *. ya))
-
-let apply_speed (xp, yp) (xv, yv) =
-	(xp +. (dt *. xv), yp +. (dt *. yv))
+let apply_der (x, y) (xx, yy) =
+	(x +. (dt *. xx), y +. (dt *. yy))
