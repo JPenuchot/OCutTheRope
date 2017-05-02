@@ -7,21 +7,22 @@
 (*	Defining a vector type that enables us
  *	to keep track of the kind of vector we're manipulating.
  *)
-type vector =
-			Pos of float * float
-		| 	Vel of float * float
-		| 	Acc of float * float
-		|   For of float * float
 
-let gravity = Acc(0., -0.9)
-(*
+let gravity = (0., -0.9)
+let dt = .1
+
 let sum_forces lst_f =
 	let rec sf lst_f (xa, ya) =
 		match lst_f with
-		| For(x, y)::tl -> sf tl For((xa +. x), (ya +. y))
-		| [] -> For(xa, ya)
-	in sf lst_f For(0., 0.)
-*)
-(*let apply_force*)
+		| (x, y)::tl -> sf tl (xa +. x, ya +. y)
+		| [] -> (xa, ya)
+	in sf lst_f (0., 0.)
 
-(*let apply_speed*)
+let force_to_acc (xf, yf) mass =
+	(xf /. mass, yf /. mass)
+
+let apply_acc (xv, yv) (xa, ya) =
+	(xv +. (dt *. xa), yv +. (dt *. ya))
+
+let apply_speed (xp, yp) (xv, yv) =
+	(xp +. (dt *. xv), yp +. (dt *. yv))
