@@ -51,4 +51,5 @@ let draw_level level =
 		| [] -> ()
 		| t::q -> draw_single_element t; draw_elements q;
 	in
-	draw_elements level
+	draw_elements level;
+	synchronize()
