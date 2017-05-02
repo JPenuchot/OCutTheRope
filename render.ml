@@ -8,4 +8,11 @@ open Graphics
 open Ppm
 open Level
 
+(* Open a graphic window *)
 let () = open_graph " 300x500" ;;
+
+(* Set transparent color *)
+
+(* Load pictures *)
+let player_sprite =
+	image_from_ppm "sprites/player.ppm";;
