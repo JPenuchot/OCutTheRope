@@ -1,7 +1,7 @@
 OCB_FLAGS = -use-ocamlfind
 OCB = 		ocamlbuild $(OCB_FLAGS)
 
-all: 		native byte # profile debug
+all: 		native byte debug # profile debug
 
 clean:
 			$(OCB) -clean
@@ -18,7 +18,11 @@ profile:
 debug:
 			$(OCB) -tag debug main.byte
 
-test: 		native
-			./main.native "OCaml" "OCamlBuild" "users"
+test: 		
+	$(OCB) -tag debug test.byte
+	./test.byte
 
-.PHONY: 	all clean byte native profile debug test
+expe: 		
+	$(OCB) -tag debug expe.byte
+
+.PHONY: 	all clean byte native profile debug tests
