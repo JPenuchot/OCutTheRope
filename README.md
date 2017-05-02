@@ -4,9 +4,9 @@ OCaml implementation of the Cut The Rope game
 ## Compilation instructions
 Compile with one of these options  
 
-- `make ; ./main.byte`  
+- `make debug ; ./game.byte`  
   to compile and run main bytecode version
-- `make ; ./main.native`  
+- `make ; ./game.native`  
   to compile and run main native version
 - `make test ; ./test.byte`  
   to compile and run tests
