@@ -5,11 +5,20 @@
  *	physics stuff and render.ml to render stuff.
  *)
 
-type player		=	{x : float; y : float; xx : float; yy : float}
-type monster	=	{x : float; y : float}
-type gravField	=	{x : float; y : float}
-type star		=	{x : float; y : float}
-type bubble		=	{x : float; y : float; gf : gravField}
-type attractor	=	{x : float; y : float; str : float}
-type rope		=	{x : float; y : float; len : float}
-type wall		=	{x : float; y : float; w : float; h : float}
+open Physics
+
+type gameObject =
+| GravField	of pos
+| Star		of pos
+| Bubble	of pos
+| Attractor	of pos * float
+| Rope		of pos * float
+| Wall		of pos * size
+| SMonster	of pos * size
+
+| Player	of pos * vel * forces
+| DMonster	of pos * vel * forces
+
+
+(*	A context (level state) is described by a list of objects. *)
+type context = gameObject list
