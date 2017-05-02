@@ -1,2 +1,2 @@
 #!/bin/bash
-mogrify -format ppm -fill '#00123456' -opaque none *.png
+mogrify -format ppm -background "#123456" -flatten *.png
