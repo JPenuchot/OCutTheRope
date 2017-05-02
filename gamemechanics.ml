@@ -5,4 +5,12 @@
  *	physics stuff and render.ml to render stuff.
  *)
 
-(*type GameObject =*)
+type gameObject =
+	| Player	of (**)
+	| Monster	of (**)
+	| Star		of (**)
+	| Bubble	of (**)
+	| Attractor	of (**)
+	| Rope		of (**)
+	| Wall		of (**)
+	| GravField	of (**)
