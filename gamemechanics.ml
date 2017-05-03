@@ -9,7 +9,8 @@ open Physics
 
 type gameObject =
 | Player	of pos * vel * ropes
-| Goal	of pos * size
+| Goal	    of pos * size
+| Monster   of pos * size
 | GravField	of accel
 | Star		of pos
 | Bubble	of pos
