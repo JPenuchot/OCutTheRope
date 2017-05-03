@@ -15,6 +15,7 @@ type gameObject =
 	| Bubble	of pos
 	| Attractor	of pos * float
 	| Wall		of pos * size
+	| Monster   of pos * size
 
 (*	A context (level state) is described by a list of objects. *)
 type context = gameObject list

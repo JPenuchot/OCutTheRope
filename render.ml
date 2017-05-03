@@ -24,10 +24,10 @@ let bubble_sprite =
 	image_from_ppm "sprites/bubble.ppm"
 let star_sprite =
 	image_from_ppm "sprites/star.ppm"
-let smonster_sprite =
-	image_from_ppm "sprites/smonster.ppm"
-let dmonster_sprite =
-	image_from_ppm "sprites/dmonster.ppm"
+let goal_sprite =
+	image_from_ppm "sprites/goal.ppm"
+let monster_sprite =
+	image_from_ppm "sprites/monster.ppm"
 let wall_sprite =
 	image_from_ppm "sprites/wall.ppm"
 let attractor_sprite =
@@ -38,16 +38,14 @@ let unknow_sprite =
 (* Simple function to draw a single element *)
 let draw_single_element element =
 	match element with
-	| GravField((posX, posY))      -> () (* No sprite *)
-	| Star((posX, posY))           -> draw_image star_sprite      (int_of_float posX) (int_of_float posY)
-	| Bubble((posX, posY))         -> draw_image bubble_sprite    (int_of_float posX) (int_of_float posY)
-	| Attractor((posX, posY), _)   -> draw_image attractor_sprite (int_of_float posX) (int_of_float posY)
-	| Wall((posX, posY), _)        -> draw_image wall_sprite      (int_of_float posX) (int_of_float posY)
-	| Goal((posX, posY), _)    -> draw_image smonster_sprite  (int_of_float posX) (int_of_float posY)
-	| Player((posX, posY), _, _)   -> draw_image player_sprite    (int_of_float posX) (int_of_float posY)
-	(*| _((posX, posY))              -> draw_image unknow_sprite    (int_of_float posX) (int_of_float posY)
-	| _((posX, posY), _)           -> draw_image unknow_sprite    (int_of_float posX) (int_of_float posY)
-	| _((posX, posY), _, _)        -> draw_image unknow_sprite    (int_of_float posX) (int_of_float posY)*)
+	| GravField((posX, posY))    -> () (* No sprite *)
+	| Star((posX, posY))         -> draw_image star_sprite      (int_of_float posX) (int_of_float posY)
+	| Bubble((posX, posY))       -> draw_image bubble_sprite    (int_of_float posX) (int_of_float posY)
+	| Attractor((posX, posY), _) -> draw_image attractor_sprite (int_of_float posX) (int_of_float posY)
+	| Wall((posX, posY), _)      -> draw_image wall_sprite      (int_of_float posX) (int_of_float posY)
+	| Goal((posX, posY), _)      -> draw_image goal_sprite      (int_of_float posX) (int_of_float posY)
+	| Player((posX, posY), _, _) -> draw_image player_sprite    (int_of_float posX) (int_of_float posY)
+	| _                          -> ()
 
 
 (* Just call this function to draw the level
