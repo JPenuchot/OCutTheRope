@@ -8,14 +8,13 @@
 open Physics
 
 type gameObject =
-| Player	of pos * vel * ropes
-| Goal	of pos * size
-| GravField	of accel
-| Star		of pos
-| Bubble	of pos
-| Attractor	of pos * float
-| Rope		of pos * length
-| Wall		of pos * size
+	| Player	of pos * vel * ropes
+	| Goal		of pos * size
+	| GravField	of accel
+	| Star		of pos
+	| Bubble	of pos
+	| Attractor	of pos * float
+	| Wall		of pos * size
 
 (*	A context (level state) is described by a list of objects. *)
 type context = gameObject list
