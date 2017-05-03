@@ -57,3 +57,5 @@ let reflect norm inc =
  *)
 let apply_der (x, y) (xx, yy) dt =
 	(x +. (dt *. xx), y +. (dt *. yy))
+
+let square_norm = ()
