@@ -32,15 +32,15 @@ let unknow_sprite =
 (* Simple function to draw a single element *)
 let draw_single_element element =
 	match element with
-	| GravField((posX, posY))      -> draw_image unknow_sprite  (int_of_float posX) (int_of_float posY)
+	| GravField((posX, posY))      -> draw_image unknow_sprite  (int_of_float posX) (int_of_float posY) (* Sprite to do *)
 	| Star((posX, posY))           -> draw_image star_sprite    (int_of_float posX) (int_of_float posY)
 	| Bubble((posX, posY))         -> draw_image bubble_sprite  (int_of_float posX) (int_of_float posY)
-	| Attractor((posX, posY), _)   -> draw_image unknow_sprite  (int_of_float posX) (int_of_float posY)
+	| Attractor((posX, posY), _)   -> draw_image unknow_sprite  (int_of_float posX) (int_of_float posY) (* Sprite to do *)
 	| Rope((posX, posY))           -> () (* Rope is not a simple sprite *)
-	| Wall((posX, posY), _)        -> draw_image unknow_sprite  (int_of_float posX) (int_of_float posY)
+	| Wall((posX, posY), _)        -> draw_image unknow_sprite  (int_of_float posX) (int_of_float posY) (* Sprite to do *)
 	| SMonster((posX, posY), _)    -> draw_image monster_sprite (int_of_float posX) (int_of_float posY)
 	| Player((posX, posY), _, _)   -> draw_image player_sprite  (int_of_float posX) (int_of_float posY)
-	| DMonster((posX, posY), _, _) -> draw_image monster_sprite (int_of_float posX) (int_of_float posY)
+	| DMonster((posX, posY), _, _) -> draw_image monster_sprite (int_of_float posX) (int_of_float posY) (* Sprite to do *)
 
 
 (* Just call this function to draw the level *)
