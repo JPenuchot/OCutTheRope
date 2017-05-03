@@ -1,1 +1,1 @@
-true : package(graphics), bin_annot
+true : package(graphics), package(str), bin_annot
