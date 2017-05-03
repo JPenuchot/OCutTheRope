@@ -26,6 +26,7 @@ type gameObject =
 	| Attractor	of pos * float
 	| Wall		of rect
 	| Monster	of rect
+	| Empty     of pos (* Empty object needed for exhaustive matching in level.ml:loadObject. Cannot being declared in a level file *)
 
 (* A context (level state) is described by a list of objects. *)
 type context = gameObject list
