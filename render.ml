@@ -7,7 +7,7 @@
 open Graphics
 open Ppm
 open Level
-open Gamemechanics
+open Gametypes
 
 (* Open a graphic window *)
 let () = open_graph " 500x700";
