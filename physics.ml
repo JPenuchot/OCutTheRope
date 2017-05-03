@@ -46,6 +46,10 @@ let ( // ) (x, y) a =
 let len_of_vec (x, y) = 
 	sqrt ((x *. x) +. (y *. y))
 
+let normalize (x, y) =
+	let l = 1. /. (len_of_vec (x, y)) in
+	l ** (x, y)
+
 (*	Get the corresponding acceleration for an object of a given mass.	*)
 let force_to_acc (xf, yf) mass =
 	(xf /. mass, yf /. mass)
@@ -61,4 +65,5 @@ let reflect norm inc =
 	inc -.. ((2. *. (inc *.. norm)) ** norm)
 
 let attract obj_pos attr_pos attr_str =
-	attr_str /. len_of_vec (obj_pos -.. attr_pos)
+	let pl_to_attr = normalize (obj_pos -.. attr_pos) in
+	(attr_str /. len_of_vec (obj_pos -.. attr_pos)) ** pl_to_attr
