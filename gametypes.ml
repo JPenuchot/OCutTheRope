@@ -25,7 +25,7 @@ type gameObject =
 	| Bubble	of sphere * accel
 	| Attractor	of pos * float
 	| Wall		of rect
-	| Monster	of rect * size
+	| Monster	of rect
 
 (* A context (level state) is described by a list of objects. *)
 type context = gameObject list
