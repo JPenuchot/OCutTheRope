@@ -21,8 +21,8 @@ type gameObject =
 	| Player	of player
 	| Goal		of rect
 	| GravField	of accel
-	| Star		of rect
-	| Bubble	of rect * accel
+	| Star		of sphere
+	| Bubble	of sphere * accel
 	| Attractor	of pos * float
 	| Wall		of rect
 	| Monster	of rect * size
