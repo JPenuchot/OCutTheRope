@@ -1,3 +1,12 @@
+(*	BASEPHYSICS.ML
+ *	
+ *	What magic relies on.
+ *	Provides a set of tools for the physics engine such as
+ *	vector algebra and other helper functions.
+ *)
+
+(* Base types *)
+
 type size = float * float
 
 type pos = float * float

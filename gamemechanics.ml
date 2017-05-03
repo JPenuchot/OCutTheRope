@@ -1,8 +1,8 @@
 (*	PHYSICS.ML
  *	
- *	Where magic is summoned.
- *	Manages the game mechanics, uses physics.ml to compute
- *	physics stuff and render.ml to render stuff.
+ *	Where magic operates.
+ *	Describes the game physics using high order functions
+ *	defined in basephysics.ml.
  *)
 
 open Gamephysics
