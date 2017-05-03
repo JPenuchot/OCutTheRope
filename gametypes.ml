@@ -14,18 +14,18 @@ type modifier =
 type modifiers = modifier list
 
 (* Describes a player *)
-type player = pos * vel * length * modifiers
+type player = sphere * vel * modifiers
 
 (* Describes an object on the map *)
 type gameObject =
 	| Player	of player
-	| Goal		of pos * size
+	| Goal		of rect
 	| GravField	of accel
-	| Star		of pos
-	| Bubble	of pos * accel
+	| Star		of rect
+	| Bubble	of rect * accel
 	| Attractor	of pos * float
-	| Wall		of pos * size
-	| Monster	of pos * size
+	| Wall		of rect
+	| Monster	of rect * size
 
 (* A context (level state) is described by a list of objects. *)
 type context = gameObject list

@@ -44,20 +44,16 @@ let vel_of_player player ctx =
 let pos_of_player player =
 	apply_der  
 
-(* Handles collision *)
-(*
-let handle_wall_collision player context =
-	let ((px, py), (pxx, pyy), _) = player in
-	match context with
-	| Wall((x, y), (w, h))::tl
-		with box_sphere_collide ()
-							-> 
-	| _::tl					->
-	| []					-> 
-*)
-(* Handles object grabbing *)
-let grab =
-	()	(* TODO *)
+let collide sph r =
+	false
 
-let bounce (x, y) (xx, yy) (wx, wy) (ww, wh) =
-	()
+(* Handles collision *)
+let rec handle_collision player context =
+	let (sph, _) = player in
+	match context with
+	| Goal(r)::tl			when collide sph r -> ()
+	| Star(r)::tl			when collide sph r -> ()
+	| Bubble(r, accel)::tl	when collide sph r -> ()
+	| Wall(r)::tl			when collide sph r -> ()
+	| _::tl -> ()
+	| []	-> ()

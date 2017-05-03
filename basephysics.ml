@@ -12,11 +12,19 @@ type size = float * float
 type pos = float * float
 type vel = float * float
 type accel = float * float
+type dim = float * float
 
 type mass = float
 type length = float
 
 type accels = accel list
+
+type sphere = pos * length
+type rect = pos * size
+
+type hitbox =
+	| Sphere	of sphere
+	| Rect		of rect
 
 (* Vector addition *)
 let ( +.. ) (xa, ya) (xb, yb) =
@@ -57,5 +65,3 @@ let reflect norm inc =
  *)
 let apply_der (x, y) (xx, yy) dt =
 	(x +. (dt *. xx), y +. (dt *. yy))
-
-let square_norm = ()
