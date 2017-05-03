@@ -31,11 +31,11 @@ let ( *.. ) (xa, ya) (xb, yb) =
 	(xa *. xb) +. (ya *. yb)
 
 (* Scalar vector product *)
-let ( ** ) a (x, y) =
+let ( **. ) a (x, y) =
 	(a *. x, a *. y)
 
 (* Scalar vector division *)
-let ( // ) (x, y) a =
+let ( //. ) (x, y) a =
 	(x /. a, y /. a)
 
 (* Returns the length of a vector *)
@@ -45,11 +45,11 @@ let len_of_vec (x, y) =
 (* Normalizes the vector *)
 let normalize (x, y) =
 	let l = 1. /. (len_of_vec (x, y)) in
-	l ** (x, y)
+	l **. (x, y)
 
 (* Returns the reflection of a vector with norm being the normal of the plan *)
 let reflect norm inc =
-	inc -.. ((2. *. (inc *.. norm)) ** norm)
+	inc -.. ((2. *. (inc *.. norm)) **. norm)
 
 (*	Apply the derivative of a component
  *	(ex. : compute new speed from current speed and acceleration,
