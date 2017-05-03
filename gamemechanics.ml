@@ -5,7 +5,8 @@
  *	physics stuff and render.ml to render stuff.
  *)
 
-open Physics
+open Gamephysics
+open Basephysics
 
 type gameObject =
 	| Player	of pos * vel * ropes
