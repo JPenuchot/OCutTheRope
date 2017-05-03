@@ -40,7 +40,7 @@ let draw_single_element element =
 	match element with
 	| GravField((posX, posY))    -> () (* No sprite *)
 	| Star((posX, posY))         -> draw_image star_sprite      (int_of_float posX) (int_of_float posY)
-	| Bubble((posX, posY))       -> draw_image bubble_sprite    (int_of_float posX) (int_of_float posY)
+	| Bubble((posX, posY),_)       -> draw_image bubble_sprite    (int_of_float posX) (int_of_float posY)
 	| Attractor((posX, posY), _) -> draw_image attractor_sprite (int_of_float posX) (int_of_float posY)
 	| Wall((posX, posY), _)      -> draw_image wall_sprite      (int_of_float posX) (int_of_float posY)
 	| Goal((posX, posY), _)      -> draw_image goal_sprite      (int_of_float posX) (int_of_float posY)

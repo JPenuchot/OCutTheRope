@@ -20,13 +20,6 @@ type ropes = rope list
 let gravity = (0., -0.9)
 let dt = 0.1
 
-(*	Apply the derivative of a component
- *	(ex. : compute new speed from current speed and acceleration,
- *	pos from current pos and speed, etc.)
- *)
-let apply_der (x, y) (xx, yy) =
-	(x +. (dt *. xx), y +. (dt *. yy))
-
 (* Attraction vector formula *)
 let attract obj_pos attr_pos attr_str =
 	let pl_to_attr = normalize (obj_pos -.. attr_pos) in
