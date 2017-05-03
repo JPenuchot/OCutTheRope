@@ -1,4 +1,4 @@
-(*	PHYSICS.ML
+(*	GAMETYPES.ML
  *	
  *	Where magic operates.
  *	Describes the game physics using high order functions
@@ -14,7 +14,7 @@ type modifier =
 type modifiers = modifier list
 
 (* Describes a player *)
-type player = pos * vel * modifiers
+type player = pos * vel * length * modifiers
 
 (* Describes an object on the map *)
 type gameObject =
