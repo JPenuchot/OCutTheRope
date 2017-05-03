@@ -10,7 +10,7 @@ open Basephysics
 
 type modifier =
 	| Bubbled	of accel
-	| Roped		of pos
+	| Roped		of pos * length
 type modifiers = modifier list
 
 (* Describes a player *)
