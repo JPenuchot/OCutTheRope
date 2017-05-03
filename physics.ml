@@ -28,24 +28,31 @@ type ropes = rope list
 let gravity = (0., -0.9)
 let dt = 0.1
 
+(* Vector addition *)
 let ( +.. ) (xa, ya) (xb, yb) =
 	(xa +. xb, ya +. yb)
 
+(* Vector substraction *)
 let ( -.. ) (xa, ya) (xb, yb) =
 	(xa -. xb, ya -. yb)
 
+(* Dot product *)
 let ( *.. ) (xa, ya) (xb, yb) =
 	(xa *. xb) +. (ya *. yb)
 
+(* Scalar vector product *)
 let ( ** ) a (x, y) =
 	(a *. x, a *. y)
 
+(* Scalar vector division *)
 let ( // ) (x, y) a =
 	(x /. a, y /. a)
 
+(* Returns the length of a vector *)
 let len_of_vec (x, y) = 
 	sqrt ((x *. x) +. (y *. y))
 
+(* Normalizes the vector *)
 let normalize (x, y) =
 	let l = 1. /. (len_of_vec (x, y)) in
 	l ** (x, y)
@@ -61,9 +68,11 @@ let force_to_acc (xf, yf) mass =
 let apply_der (x, y) (xx, yy) =
 	(x +. (dt *. xx), y +. (dt *. yy))
 
+(* Returns the reflection of a vector with norm being the normal of the plan *)
 let reflect norm inc =
 	inc -.. ((2. *. (inc *.. norm)) ** norm)
 
+(* Attraction vector formula *)
 let attract obj_pos attr_pos attr_str =
 	let pl_to_attr = normalize (obj_pos -.. attr_pos) in
 	(attr_str /. len_of_vec (obj_pos -.. attr_pos)) ** pl_to_attr

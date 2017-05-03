@@ -17,10 +17,10 @@ type gameObject =
 	| Wall		of pos * size
 	| Monster   of pos * size
 
-(*	A context (level state) is described by a list of objects. *)
+(* A context (level state) is described by a list of objects. *)
 type context = gameObject list
 
-(*	Computes acceleration	*)
+(* Computes acceleration *)
 let acc_of_context player_pos ctx =
 	let rec aoc ctx acc =
 		match ctx with
@@ -30,10 +30,10 @@ let acc_of_context player_pos ctx =
 		| []						-> acc
 	in aoc ctx []
 
-(*	Computes speed	*)
+(* Computes speed *)
 let vel_of_context player_pos player_vel ctx =
 	()	(* TODO *)
 
-(*	Computes pos	*)
+(* Computes pos *)
 let pos_of_context =
 	()	(* TODO *)
