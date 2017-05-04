@@ -49,7 +49,7 @@ let collide a b =
 
 (* Handles environment collisions then returns a new player. *)
 let rec handle_env_collision player context =
-	let (sph, vel, _) = player in
+	let (sph, vel, m) = player in
 	match context with
 	| Star(s)::tl			
 		when (collide (Sphere(sph)) (Sphere(s))) ->
@@ -59,7 +59,7 @@ let rec handle_env_collision player context =
 		when (collide (Sphere(sph)) (Sphere(s))) ->
 			let (nsph, nvel) = sr_collide sph s vel in
 			handle_env_collision (nsph, nvel, m) tl
-	| Goal(r)::tl			
+	| Goal(r)::tl
 		when (collide (Sphere(sph)) (Rect(r)))   ->
 			let (nsph, nvel) = rr_collide sph r vel in
 			handle_env_collision (nsph, nvel, m) tl
@@ -67,7 +67,7 @@ let rec handle_env_collision player context =
 		when (collide (Sphere(sph)) (Rect(r)))   ->
 			let (nsph, nvel) = rr_collide sph r vel in
 			handle_env_collision (nsph, nvel, m) tl
-	| _::tl -> handle_collision player tl
+	| _::tl -> handle_env_collision player tl
 	| []	-> player
 
 let handle_rope_collision player = ()

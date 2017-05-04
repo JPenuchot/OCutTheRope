@@ -89,13 +89,15 @@ let check_col_rr ((xa, ya),(wa, ha)) ((xb, yb),(wb, hb)) =
 
 let check_col_rope pl_pos rope =
 	let (rope_pos, rope_len) = rope in
-	len_of_vec (pl_pos) 
+	len_of_vec (pl_pos -.. rope_pos) > rope_len
 
 (* COLLISION HANDLING *)
 
 let sr_collide sa sb vel =
-	()
+	(sa, vel)
+
 let rr_collide s r vel =
-	()
+	(s, vel)
+
 let rope_collide rope pos vel =
 	()
