@@ -11,6 +11,7 @@ open Basephysics
 type modifier =
 	| Bubbled	of accel
 	| Roped		of rope
+	| Point
 type modifiers = modifier list
 
 (* Describes a player *)
@@ -30,3 +31,9 @@ type gameObject =
 
 (* A context (level state) is described by a list of objects. *)
 type context = gameObject list
+
+(* Those are thrown when the game ends. They contain the number of points the player earned. *)
+type kindEnd =
+	| Win	of int
+	| Die	of int
+exception EndGame of kindEnd

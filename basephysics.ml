@@ -69,8 +69,17 @@ let apply_der (x, y) (xx, yy) dt =
 
 (* COLLISION DETECTION *)
 
-(* Checks for collision between a sphere and a rectangle. *)
-let check_col_sr sp re =
+(* Checks for collision between a sphere and the corner of a rectangle. *)
+let check_col_corner_sr sp re =
+	let (spos, srad) = sp in
+	let ((rx, ry), (rw, rh)) = re in
+	len_of_vec (spos -.. (rx, ry)) < srad ||
+	len_of_vec (spos -.. (rx, ry +. rh)) < srad ||
+	len_of_vec (spos -.. (rx +. rw, ry)) < srad ||
+	len_of_vec (spos -.. (rx +. rw, ry +. rh)) < srad
+
+(* Checks for collision between a sphere and the face of a rectangle. *)
+let check_col_wall_sr sp re =
 	false
 
 (* Checks for collision between two spheres. *)
@@ -87,22 +96,24 @@ let check_col_rr ((xa, ya),(wa, ha)) ((xb, yb),(wb, hb)) =
 	   (((xb > xa && xb < xa +. wa) || (xb +. wb > xa && xb +. wb < xa +. wa))
 	&&	((yb > ya && yb < ya +. ha) || (yb +. hb > ya && yb +. hb < ya +. ha)))
 
-(* Predicate for sphere/rectangle*)
-let collide a b =
-	match a, b with
-	| Sphere(a), Sphere(b)	-> check_col_ss a b
-	| Sphere(a), Rect(b)	-> check_col_sr a b
-	| Rect(a), Sphere(b)	-> check_col_sr b a
-	| Rect(a), Rect(b)		-> check_col_rr a b
-
+(* Checks for a rope collision. *)
 let check_col_rope pl_pos rope =
 	let (rope_pos, rope_len) = rope in
 	len_of_vec (pl_pos -.. rope_pos) > rope_len
 
 (* COLLISION HANDLING *)
 
-let sr_collide s r vel =
-	(s, vel)
+let sr_wall_collide s r vel =
+	if check_col_wall_sr s r then
+		(s, vel)
+	else
+		(s, vel)
+
+let sr_corner_collide s r vel =
+	if check_col_corner_sr s r then
+		(s, vel)
+	else
+		(s, vel)
 
 
 let ss_collide sa sb vel dt =
