@@ -69,8 +69,10 @@ let regExpGameObject =
 	"\\)$"
 let regExpLine = regexp regExpGameObject
 
-(* TODO: Une fonction qui prend une châine et une regexp et qui retourne une liste de mots matchés *)
-
+(* Prints the groups mathced by the last regexp 
+ * Warning: Always raise a uncaught exception! 
+ *          Use only for dubugging.
+ *)
 let rec print_groups str n =
 	Printf.printf "print_groups:%s\n" (matched_group n str);
 	print_groups str (n+1)
@@ -91,6 +93,7 @@ let get_matched_groups exp str =
 		gmg str [|""|] 1
 	end else [||]
 
+(* Print a string array *)
 let print_array arr =
 	print_string "[|\n";
 	Array.iter (fun s -> print_string ("	" ^ s ^ "\n")) arr;
