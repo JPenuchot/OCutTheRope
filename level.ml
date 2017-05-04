@@ -76,17 +76,26 @@ let rec print_groups str n =
 (* Return an array of string representing the result of matched_group for a given regexp *)
 let get_matched_groups exp str =
 	(* Match the string for using matched_group *)
-	string_match exp str 0;
-	(* Reccursive function who build the array *)
-	let rec gmg str arr n =
-		try
-			gmg str (Array.append arr [|matched_group n str|]) (n+1)
-		with Not_found ->
-			arr
-	in
-	(* We put an element in the array so the indice will match with matched_group's indice *)
-	gmg str [|""|] 1
+	if string_match exp str 0 then begin
+		(* Reccursive function who build the array *)
+		let rec gmg str arr n =
+			try
+				gmg str (Array.append arr [|matched_group n str|]) (n+1)
+			with
+			| Not_found -> arr
+			| Invalid_argument(_) -> arr
+		in
+		(* We put an element in the array so the indice will match with matched_group's indice *)
+		gmg str [|""|] 1
+	end else [||]
 
+let print_array arr =
+	print_string "[|\n";
+	Array.iter (fun s -> print_string ("	" ^ s ^ "\n")) arr;
+	print_string "|]\n"
+
+exception UnknowModifier
+exception UnknowGameObject
 
 (* Returns a modifiers list from a text *)
 let rec loadModifiers str =
@@ -98,17 +107,19 @@ let rec loadModifiers str =
 			failwith ("loadModifiers: Given string is not a corret modifier list! \"" ^ str ^ "\"");
 		(* Get the current modifier and its informations *)
 		let modifiersGroups = get_matched_groups (regexp regExpModifiersInner) str in
-		let currentModifier = modifiersGroups.(3) in
-		let currentModifierLen = length currentModifier in
-		let nextModifierLen = (length str) - currentModifierLen - 1 in
+		let currentModifier = modifiersGroups.(2) in
+		let currentModifierLen = (length currentModifier) in
+		let nextModifierLen = ((length str) - currentModifierLen - 1) in
 		let nextModifier = if nextModifierLen <= 0 then "" else (sub str (currentModifierLen + 1) nextModifierLen) in
 		(* Match the modifier *)
 		match (sub str 0 1) with
-		| "B" -> Bubbled(((float_of_string modifiersGroups.(6)),(float_of_string modifiersGroups.(7))))
-				::(loadModifiers nextModifier)
-		| "R" -> 
-				Roped(((0.),(0.)),(0.),(0.))
-				::(loadModifiers nextModifier)
+		| "B" -> let bubbledGroups = get_matched_groups (regexp regExpBubbled) str in
+				(loadModifiers nextModifier)@
+				[Bubbled(((float_of_string bubbledGroups.(3)),(float_of_string bubbledGroups.(4))))]
+		| "R" -> let ropedGroups = get_matched_groups (regexp regExpRoped) str in
+				(loadModifiers nextModifier)@
+				[Roped(((float_of_string ropedGroups.(4)),(float_of_string ropedGroups.(5))),(float_of_string ropedGroups.(6)),(float_of_string ropedGroups.(7)))]
+		| _   -> raise UnknowModifier
 	end
 
 (*	Object loading *)
@@ -116,17 +127,41 @@ let loadObject str =
 	(* Check the string *)
 	if not (string_match regExpLine str 0) then
 		failwith ("loadObject: Given string is not a correct game object! \"" ^ str ^ "\"");
-	(* Get the latched group *)
-	let lineGroups = get_matched_groups regExpLine str in
 	(* Match the object *)
 	match (sub str 0 2) with
-	| "Pl" -> Player (
-					(((float_of_string lineGroups.(5)), (float_of_string lineGroups.(6))), (float_of_string lineGroups.(7))),
-					((float_of_string lineGroups.(9)), (float_of_string lineGroups.(10))),
-					(loadModifiers lineGroups.(12))
+	| "Pl" -> let playGroups = get_matched_groups (regexp regExpPlayer) str in
+				Player (
+					(((float_of_string playGroups.(4)), (float_of_string playGroups.(5))), (float_of_string playGroups.(6))),
+					((float_of_string playGroups.(8)), (float_of_string playGroups.(9))),
+					(loadModifiers playGroups.(11))
 				)
-	(*| "Pl" -> print_groups str 1*)
-	| _ -> Empty((0.,0.)) (* We use an Empty element to have an exhaustive pattern matching *)
+	| "Go" -> let goalGroups = get_matched_groups (regexp regExpGoal) str in
+				Goal(
+					((float_of_string goalGroups.(4)),(float_of_string goalGroups.(5))),
+					((float_of_string goalGroups.(7)),(float_of_string goalGroups.(8)))
+				)
+	| "Gr" -> let gravFieldGroups = get_matched_groups (regexp regExpGravField) str in
+				GravField(((float_of_string gravFieldGroups.(3)),(float_of_string gravFieldGroups.(4))))
+	| "St" -> let starGroups = get_matched_groups (regexp regExpStar) str in
+				Star(((float_of_string starGroups.(4)),(float_of_string starGroups.(5))),(float_of_string starGroups.(6)))
+	| "Bu" -> let bubbleGroups = get_matched_groups (regexp regExpBubble) str in
+				Bubble(
+					(((float_of_string bubbleGroups.(4)),(float_of_string bubbleGroups.(5))),(float_of_string bubbleGroups.(6))),
+					((float_of_string bubbleGroups.(8)),(float_of_string bubbleGroups.(9)))
+				)
+	| "At" -> let attractorGroups = get_matched_groups (regexp regExpAttractor) str in
+				Attractor(((float_of_string attractorGroups.(3)),(float_of_string attractorGroups.(4))), (float_of_string attractorGroups.(5)))
+	| "Wa" -> let wallGroups = get_matched_groups (regexp regExpWall) str in
+				Wall((
+						((float_of_string wallGroups.(4)), (float_of_string wallGroups.(5))),
+						((float_of_string wallGroups.(7)), (float_of_string wallGroups.(8)))
+					))
+	| "Mo" -> let monsterGroups = get_matched_groups (regexp regExpMonster) str in
+				Monster((
+						((float_of_string monsterGroups.(4)), (float_of_string monsterGroups.(5))),
+						((float_of_string monsterGroups.(7)), (float_of_string monsterGroups.(8)))
+					))
+	| _    -> raise UnknowGameObject
 
 (*	Level loading *)
 let loadLevel file =
