@@ -21,6 +21,7 @@ type accels = accel list
 
 type sphere = pos * length
 type rect = pos * size
+type rope = pos * length * float
 
 type hitbox =
 	| Sphere	of sphere
@@ -87,11 +88,14 @@ let check_col_rr ((xa, ya),(wa, ha)) ((xb, yb),(wb, hb)) =
 	&&	((yb > ya && yb < ya +. ha) || (yb +. hb > ya && yb +. hb < ya +. ha)))
 
 let check_col_rope pl_pos rope =
-	()
+	let (rope_pos, rope_len) = rope in
+	len_of_vec (pl_pos) 
 
 (* COLLISION HANDLING *)
 
 let sr_collide sa sb vel =
 	()
 let rr_collide s r vel =
+	()
+let rope_collide rope pos vel =
 	()
