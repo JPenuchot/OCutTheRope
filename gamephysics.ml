@@ -40,36 +40,30 @@ let vel_of_player player ctx =
 	let (_, vel, _, _) = player in
 	apply_der vel accel dt
 
-let collide a b =
-	match a, b with
-	| Sphere(a), Sphere(b)	-> check_col_ss a b
-	| Sphere(a), Rect(b)	-> check_col_sr a b
-	| Rect(a), Sphere(b)	-> check_col_sr b a
-	| Rect(a), Rect(b)		-> check_col_rr a b
-
 (* Handles environment collisions then returns a new player. *)
 let rec handle_env_collision player context =
 	let (sph, vel, m) = player in
 	match context with
 	| Star(s)::tl			
 		when (collide (Sphere(sph)) (Sphere(s))) ->
-			let (nsph, nvel) = sr_collide sph s vel in
+			let (nsph, nvel) = ss_collide sph s vel dt in
 			handle_env_collision (nsph, nvel, m) tl
 	| Bubble(s, accel)::tl	
 		when (collide (Sphere(sph)) (Sphere(s))) ->
-			let (nsph, nvel) = sr_collide sph s vel in
+			let (nsph, nvel) = ss_collide sph s vel dt in
 			handle_env_collision (nsph, nvel, m) tl
 	| Goal(r)::tl
 		when (collide (Sphere(sph)) (Rect(r)))   ->
-			let (nsph, nvel) = rr_collide sph r vel in
+			let (nsph, nvel) = sr_collide sph r vel in
 			handle_env_collision (nsph, nvel, m) tl
 	| Wall(r)::tl			
 		when (collide (Sphere(sph)) (Rect(r)))   ->
-			let (nsph, nvel) = rr_collide sph r vel in
+			let (nsph, nvel) = sr_collide sph r vel in
 			handle_env_collision (nsph, nvel, m) tl
 	| _::tl -> handle_env_collision player tl
 	| []	-> player
 
+(* Handles rope collisions then returns a new player. *)
 let handle_rope_collision player = ()
 	(*let ((pos, _), velo, modifs) = player in
 	let rec hrc pos vel md =*)
