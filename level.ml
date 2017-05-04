@@ -184,4 +184,26 @@ let loadLevel file =
 	in
 	read_file (open_in file) true []
 
+(* Transform a level to a string *)
+let level2String level =
+	let rec matchGameObjects str level =
+		match level with
+		| h::q -> (
+			match h with
+			| Player(((a, b), c),(d,e),_) -> matchGameObjects (str ^ "\nPlayer(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "),[])") q
+			| _ -> matchGameObjects (str ^ "\nUNKNOW") q
+		);
+		| [] -> str
+	in
+	matchGameObjects "#START" level
+
 (* Save a level to a file *)
+let saveLevel level file =
+	let channel = open_out file in
+		output_string channel (level2String level);
+		close_out channel
+
+
+
+
+
