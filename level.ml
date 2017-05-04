@@ -24,11 +24,13 @@ let regExpSphere =
 	"\\((" ^ regExpPos ^ "," ^ regExpLength ^ ")\\)"
 let regExpRect =
 	"\\((" ^ regExpPos ^ "," ^ regExpSize ^ ")\\)"
+let regExpRope =
+	"\\((" ^ regExpPos ^ "," ^ regExpLength ^ "," ^ regExpFloat ^ ")\\)"
 (* Types from gametypes.ml *)
 let regExpBubbled =
 	"\\(Bubbled(" ^ regExpAccel ^ ")\\)"
 let regExpRoped =
-	"\\(Roped(" ^ regExpPos ^ "," ^ regExpLength ^ ")\\)"
+	"\\(Roped(" ^ regExpRope ^ ")\\)"
 let regExpModifier =
 	"\\(" ^ regExpBubbled ^ "\\|" ^ regExpRoped ^ "\\)"
 let regExpModifiersInner =
@@ -71,59 +73,58 @@ let rec print_groups str n =
 	Printf.printf "print_groups:%s\n" (matched_group n str);
 	print_groups str (n+1)
 
+(* Return an array of string representing the result of matched_group for a given regexp *)
+let get_matched_groups exp str =
+	(* Match the string for using matched_group *)
+	string_match exp str 0;
+	(* Reccursive function who build the array *)
+	let rec gmg str arr n =
+		try
+			gmg str (Array.append arr [|matched_group n str|]) (n+1)
+		with Not_found ->
+			arr
+	in
+	(* We put an element in the array so the indice will match with matched_group's indice *)
+	gmg str [|""|] 1
+
+
 (* Returns a modifiers list from a text *)
 let rec loadModifiers str =
-	if (length str) <> 0 then begin
-		if not (string_match (regexp regExpModifiersInner) str 0) then
-			failwith "loadModifiers: Given string is not a correct modifiers list";
-		let subModifier =
-			matched_group 2 str
-		in
-		(* We need to use this expression because "matched_group" uses the lasr regexp used *)
-		if not (string_match (regexp regExpModifier) subModifier 0) then
-			failwith "loadModifiers: Given string is not a correct modifier";
-		let subModifierLen = length subModifier in
-		(* If there is more than one modifier *)
-		if subModifierLen <> 0 then begin
-			(* Get the remaining modifiers to parse *)
-			let nextString =
-				let stringStart = (subModifierLen+1) in
-				let stringLen = ((length str)-subModifierLen-1) in
-				if stringLen > 0 then
-					(sub str stringStart stringLen)
-				else
-					""
-			in
-			let nexModifiers = (loadModifiers nextString) in
-			(* Match the current modifier and create it *)
-			match (sub subModifier 0 1) with
-			| "B" -> string_match (regexp regExpBubbled) subModifier 0;
-				Bubbled(((float_of_string (matched_group 3 subModifier)),(float_of_string (matched_group 4 subModifier))))
-				::nexModifiers
-			(* We must re-match to avoid weird errors *)
-			| "R" -> string_match (regexp regExpRoped) subModifier 0;
-				Roped(((float_of_string (matched_group 3 subModifier)),(float_of_string (matched_group 4 subModifier))), (float_of_string (matched_group 5 subModifier)))
-				::nexModifiers
-		end else
-			[]
-	end else
+	if (length str) = 0 then
 		[]
+	else begin
+		(* Check if match *)
+		if not (string_match (regexp regExpModifiersInner) str 0) then
+			failwith ("loadModifiers: Given string is not a corret modifier list! \"" ^ str ^ "\"");
+		(* Get the current modifier and its informations *)
+		let modifiersGroups = get_matched_groups (regexp regExpModifiersInner) str in
+		let currentModifier = modifiersGroups.(3) in
+		let currentModifierLen = length currentModifier in
+		let nextModifierLen = (length str) - currentModifierLen - 1 in
+		let nextModifier = if nextModifierLen <= 0 then "" else (sub str (currentModifierLen + 1) nextModifierLen) in
+		(* Match the modifier *)
+		match (sub str 0 1) with
+		| "B" -> Bubbled(((float_of_string modifiersGroups.(6)),(float_of_string modifiersGroups.(7))))
+				::(loadModifiers nextModifier)
+		| "R" -> 
+				Roped(((0.),(0.)),(0.),(0.))
+				::(loadModifiers nextModifier)
+	end
 
 (*	Object loading *)
 let loadObject str =
 	(* Check the string *)
 	if not (string_match regExpLine str 0) then
 		failwith ("loadObject: Given string is not a correct game object! \"" ^ str ^ "\"");
-	let playerModifiers = loadModifiers (matched_group 12 str) in
-	string_match regExpLine str 0;
+	(* Get the latched group *)
+	let lineGroups = get_matched_groups regExpLine str in
 	(* Match the object *)
-	Printf.printf "loadObject %s\n" str;
 	match (sub str 0 2) with
-	| "Pl" -> Player(
-						((float_of_string (matched_group 5 str), float_of_string (matched_group 6 str)), float_of_string (matched_group 7 str)),
-						(float_of_string (matched_group 9 str), float_of_string (matched_group 10 str)),
-						playerModifiers
-					)
+	| "Pl" -> Player (
+					(((float_of_string lineGroups.(5)), (float_of_string lineGroups.(6))), (float_of_string lineGroups.(7))),
+					((float_of_string lineGroups.(9)), (float_of_string lineGroups.(10))),
+					(loadModifiers lineGroups.(12))
+				)
 	(*| "Pl" -> print_groups str 1*)
 	| _ -> Empty((0.,0.)) (* We use an Empty element to have an exhaustive pattern matching *)
 
