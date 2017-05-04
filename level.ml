@@ -183,3 +183,5 @@ let loadLevel file =
 		end;
 	in
 	read_file (open_in file) true []
+
+(* Save a level to a file *)
