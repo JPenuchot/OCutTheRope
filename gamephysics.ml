@@ -46,7 +46,7 @@ let rec handle_env_collision player context =
 	| Star(s)::tl
 		when (check_col_ss sph s) -> (* TODO : Star grabbing *)
 			let (nsph, nvel) = ss_collide sph s vel dt in
-			handle_env_collision (nsph, nvel, m) tl
+			handle_env_collision (nsph, nvel, Point::m) tl
 	| Bubble(s, accel)::tl	
 		when (check_col_ss sph s) -> (* TODO : Bubble grabbing *)
 			let (nsph, nvel) = ss_collide sph s vel dt in

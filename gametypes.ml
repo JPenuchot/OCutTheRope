@@ -11,7 +11,7 @@ open Basephysics
 type modifier =
 	| Bubbled	of accel
 	| Roped		of rope
-	| Star
+	| Point
 type modifiers = modifier list
 
 (* Describes a player *)
