@@ -111,20 +111,47 @@ let sr_wall_collide s r vel =
 
 let sr_corner_collide s r vel =
 	if check_col_corner_sr s r then
-		(s, vel)
+		
+		let (spc, slen) = s in
+		let ((x, y), (w, h)) = r in
+		
+		(* Check which corner was hit *)
+		let corlist = [(x, y); (x, y+.h); (x+.w, y); (x+.w, y+.h)] in
+		let rec mindist co acc =
+			let (best, min) = acc in
+			match co with
+			| c::tl ->	let curr = len_of_vec (c -.. spc) in
+						if curr < min then
+							mindist tl (c, curr)
+						else
+							mindist tl acc
+			| [] -> (best, min)
+		in
+		let (cor, dist) = mindist corlist ((0., 0.), max_float) in
+
+		(* Update speed accordingly *)
+		let norm = normalize (spc -.. cor) in
+		let nvel = reflect norm vel in
+
+		(* Then update sphere position *)
+		let nspc = spc +.. ((slen -. dist) **. norm) in
+		((nspc, slen),nvel)
 	else
 		(s, vel)
 
-
+(* Manages collision between two spheres *)
 let ss_collide sa sb vel dt =
-	let (posa, lena) = sa in
-	let (posb, lenb) = sb in
-	let dist = posa -.. posb in
-	let norm = normalize dist in
-	let nvel = reflect norm vel in
-	let ncoef = lena +. lenb -. (len_of_vec dist) in
-	let npos = (ncoef **. norm) +.. (dt **. nvel) +.. posa in
-	((npos, lena), nvel)
+	if check_col_ss sa sb then
+		let (posa, lena) = sa in
+		let (posb, lenb) = sb in
+		let dist = posa -.. posb in
+		let norm = normalize dist in
+		let nvel = reflect norm vel in
+		let ncoef = lena +. lenb -. (len_of_vec dist) in
+		let npos = (ncoef **. norm) +.. (dt **. nvel) +.. posa in
+		((npos, lena), nvel)
+	else
+		(sa, vel)
 
 let rope_collide rope pos vel =
 	()

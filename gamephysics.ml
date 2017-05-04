@@ -43,14 +43,10 @@ let vel_of_player player ctx =
 let rec handle_env_collision player context =
 	let (sph, vel, m) = player in
 	match context with
-	| Star(s)::tl
-		when (check_col_ss sph s) -> (* TODO : Star grabbing *)
-			let (nsph, nvel) = ss_collide sph s vel dt in
-			handle_env_collision (nsph, nvel, Point::m) tl
-	| Bubble(s, accel)::tl	
-		when (check_col_ss sph s) -> (* TODO : Bubble grabbing *)
-			let (nsph, nvel) = ss_collide sph s vel dt in
-			handle_env_collision (nsph, nvel, (Bubbled(accel)::m)) tl
+	| Star(s)::tl when (check_col_ss sph s) ->
+		handle_env_collision (sph, vel, Point::m) tl
+	| Bubble(s, accel)::tl when (check_col_ss sph s) ->
+		handle_env_collision (sph, vel, (Bubbled(accel)::m)) tl
 	| Goal(r)::tl
 		when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) ->
 			raise (EndGame(Win(0)))
@@ -62,10 +58,10 @@ let rec handle_env_collision player context =
 	| []	-> player
 
 (* Handles rope collisions then returns a new player. *)
-let handle_rope_collision player = ()
+let handle_rope_collision player = ()	(* TODO *)
 	(*let ((pos, _), velo, modifs) = player in
 	let rec hrc pos vel md =*)
 
 (* Computes new player *)
 let iterate_player player =
-	()
+	() (* TODO *)
