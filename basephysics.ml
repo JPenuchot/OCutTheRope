@@ -65,3 +65,33 @@ let reflect norm inc =
  *)
 let apply_der (x, y) (xx, yy) dt =
 	(x +. (dt *. xx), y +. (dt *. yy))
+
+(* COLLISION DETECTION *)
+
+(* Checks for collision between a sphere and a rectangle. *)
+let check_col_sr sp re =
+	false
+
+(* Checks for collision between two spheres. *)
+let check_col_ss spa spb =
+	let (posa, lena) = spa in
+	let (posb, lenb) = spb in
+	(len_of_vec (posb -.. posa)) <= (lena +. lenb)
+
+(* Checks for collision between two rectangles. *)
+let check_col_rr ((xa, ya),(wa, ha)) ((xb, yb),(wb, hb)) =
+	   (((xa > xb && xa < xb +. wb) || (xa +. wa > xb && xa +. wa < xb +. wb))
+	&&	((ya > yb && ya < yb +. hb) || (ya +. ha > yb && ya +. ha < yb +. hb)))
+	||
+	   (((xb > xa && xb < xa +. wa) || (xb +. wb > xa && xb +. wb < xa +. wa))
+	&&	((yb > ya && yb < ya +. ha) || (yb +. hb > ya && yb +. hb < ya +. ha)))
+
+let check_col_rope pl_pos rope =
+	()
+
+(* COLLISION HANDLING *)
+
+let sr_collide sa sb vel =
+	()
+let rr_collide s r vel =
+	()
