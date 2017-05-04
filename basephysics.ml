@@ -87,17 +87,33 @@ let check_col_rr ((xa, ya),(wa, ha)) ((xb, yb),(wb, hb)) =
 	   (((xb > xa && xb < xa +. wa) || (xb +. wb > xa && xb +. wb < xa +. wa))
 	&&	((yb > ya && yb < ya +. ha) || (yb +. hb > ya && yb +. hb < ya +. ha)))
 
+(* Predicate for sphere/rectangle*)
+let collide a b =
+	match a, b with
+	| Sphere(a), Sphere(b)	-> check_col_ss a b
+	| Sphere(a), Rect(b)	-> check_col_sr a b
+	| Rect(a), Sphere(b)	-> check_col_sr b a
+	| Rect(a), Rect(b)		-> check_col_rr a b
+
 let check_col_rope pl_pos rope =
 	let (rope_pos, rope_len) = rope in
 	len_of_vec (pl_pos -.. rope_pos) > rope_len
 
 (* COLLISION HANDLING *)
 
-let sr_collide sa sb vel =
-	(sa, vel)
-
-let rr_collide s r vel =
+let sr_collide s r vel =
 	(s, vel)
+
+
+let ss_collide sa sb vel dt =
+	let (posa, lena) = sa in
+	let (posb, lenb) = sb in
+	let dist = posa -.. posb in
+	let norm = normalize dist in
+	let nvel = reflect norm vel in
+	let ncoef = lena +. lenb -. (len_of_vec dist) in
+	let npos = (ncoef **. norm) +.. (dt **. nvel) +.. posa in
+	((npos, lena), nvel)
 
 let rope_collide rope pos vel =
 	()
