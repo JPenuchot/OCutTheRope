@@ -7,7 +7,6 @@
 open Basephysics
 open Gametypes
 
-let gravity = (0., -0.9)
 let dt = 0.1
 
 (* Attraction vector formula *)
@@ -44,22 +43,21 @@ let vel_of_player player ctx =
 let rec handle_env_collision player context =
 	let (sph, vel, m) = player in
 	match context with
-	| Star(s)::tl			
-		when (collide (Sphere(sph)) (Sphere(s))) ->
+	| Star(s)::tl
+		when (check_col_ss sph s) -> (* TODO : Star grabbing *)
 			let (nsph, nvel) = ss_collide sph s vel dt in
 			handle_env_collision (nsph, nvel, m) tl
 	| Bubble(s, accel)::tl	
-		when (collide (Sphere(sph)) (Sphere(s))) ->
+		when (check_col_ss sph s) -> (* TODO : Bubble grabbing *)
 			let (nsph, nvel) = ss_collide sph s vel dt in
-			handle_env_collision (nsph, nvel, m) tl
+			handle_env_collision (nsph, nvel, (Bubbled(accel)::m)) tl
 	| Goal(r)::tl
-		when (collide (Sphere(sph)) (Rect(r)))   ->
-			let (nsph, nvel) = sr_collide sph r vel in
-			handle_env_collision (nsph, nvel, m) tl
-	| Wall(r)::tl			
-		when (collide (Sphere(sph)) (Rect(r)))   ->
-			let (nsph, nvel) = sr_collide sph r vel in
-			handle_env_collision (nsph, nvel, m) tl
+		when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) ->
+			raise (EndGame(Win(0)))
+	| Wall(r)::tl ->
+			let (nsph, nvel) = sr_corner_collide sph r vel in
+			let (nnsph, nnvel) = sr_wall_collide nsph r nvel in
+			handle_env_collision (nnsph, nnvel, m) tl
 	| _::tl -> handle_env_collision player tl
 	| []	-> player
 
