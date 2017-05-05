@@ -1,4 +1,4 @@
-(*	PHYSICS.ML
+(*	LEVEL.ML
  *	
  *	Where magic is loaded and stored.
  *	Levels are loaded and stored here (Will be used for the editor).
@@ -31,8 +31,10 @@ let regExpBubbled =
 	"\\(Bubbled(" ^ regExpAccel ^ ")\\)"
 let regExpRoped =
 	"\\(Roped(" ^ regExpRope ^ ")\\)"
+let regExpPoint =
+	"\\(Point\\)"
 let regExpModifier =
-	"\\(" ^ regExpBubbled ^ "\\|" ^ regExpRoped ^ "\\)"
+	"\\(" ^ regExpBubbled ^ "\\|" ^ regExpRoped ^ "\\|" ^ regExpPoint ^  "\\)"
 let regExpModifiersInner =
 	"\\(" ^ regExpModifier ^ "\\(;" ^ regExpModifier ^ "\\)*" ^ "\\)?"
 let regExpModifiers =
@@ -67,8 +69,10 @@ let regExpGameObject =
 	"\\)$"
 let regExpLine = regexp regExpGameObject
 
-(* TODO: Une fonction qui prend une châine et une regexp et qui retourne une liste de mots matchés *)
-
+(* Prints the groups mathced by the last regexp 
+ * Warning: Always raise a uncaught exception! 
+ *          Use only for dubugging.
+ *)
 let rec print_groups str n =
 	Printf.printf "print_groups:%s\n" (matched_group n str);
 	print_groups str (n+1)
@@ -89,6 +93,7 @@ let get_matched_groups exp str =
 		gmg str [|""|] 1
 	end else [||]
 
+(* Print a string array *)
 let print_array arr =
 	print_string "[|\n";
 	Array.iter (fun s -> print_string ("	" ^ s ^ "\n")) arr;
@@ -119,6 +124,8 @@ let rec loadModifiers str =
 		| "R" -> let ropedGroups = get_matched_groups (regexp regExpRoped) str in
 				(loadModifiers nextModifier)@
 				[Roped(((float_of_string ropedGroups.(4)),(float_of_string ropedGroups.(5))),(float_of_string ropedGroups.(6)),(float_of_string ropedGroups.(7)))]
+		| "P" -> (loadModifiers nextModifier)@
+				[Point]
 		| _   -> raise UnknowModifier
 	end
 
@@ -170,16 +177,56 @@ let loadLevel file =
 		(* The file must have "# OCutTheRope Level File 1.0" on it's first line *)
 		if check_header then begin
 			if (input_line handle) <> "# OCutTheRope Level File 1.0" then
-				failwith "Level file header not found!";
+				failwith "Level file header not found or incorrect!";
 			read_file handle false level
 		end
 		else begin
 			try
 				(* Give the line to the loading object function *)
-				read_file handle false level@[loadObject (input_line handle)]
+				read_file handle false (level@[(loadObject (input_line handle))])
 			with End_of_file ->
 				close_in handle;
 				level
 		end;
 	in
 	read_file (open_in file) true []
+
+(* Transforms modifiers to string *)
+let modifiers2String m =
+	let rec m2s s m =
+		match m with
+		| h::q -> (
+			match h with
+			| Bubbled((a,b))     -> m2s ("Bubbled((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "));" ^ s) q
+			| Roped(((a,b),c,d)) -> m2s ("Roped(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ "));" ^ s) q
+			| Point              -> m2s ("Point;" ^ s) q
+		)
+		| [] -> (sub s 0 ((length s)-1)) (* Remove the last semicolon *)
+	in
+	m2s "" m
+
+(* Transform a level to a string *)
+(* TODO match others gameObjects and modifiers *)
+let level2String level =
+	let rec matchGameObjects str level =
+		match level with
+		| h::q -> (
+			match h with
+			| Player(((a, b), c),(d,e),f) -> matchGameObjects (str ^ "\nPlayer(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "),[" ^ (modifiers2String f) ^ "])") q
+			| Goal(((a,b),(c,d)))         -> matchGameObjects (str ^ "\nGoal(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| GravField((a,b))            -> matchGameObjects (str ^ "\nGravField((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "))") q
+			| Star(((a,b),c))             -> matchGameObjects (str ^ "\nStar(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "))") q
+			| Bubble(((a,b),c),(d,e))     -> matchGameObjects (str ^ "\nBubble(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "))") q
+			| Attractor((a,b),c)          -> matchGameObjects (str ^ "\nAttractor((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ ")") q
+			| Wall(((a,b),(c,d)))         -> matchGameObjects (str ^ "\nWall(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| Monster(((a,b),(c,d)))      -> matchGameObjects (str ^ "\nMonster(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+		)
+		| [] -> str
+	in
+	matchGameObjects "# OCutTheRope Level File 1.0" level
+
+(* Save a level to a file *)
+let saveLevel level file =
+	let channel = open_out file in
+		output_string channel (level2String level);
+		close_out channel
