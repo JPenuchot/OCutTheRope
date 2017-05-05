@@ -41,8 +41,21 @@ let iterate_game context =
 		| []	-> fus_players apl acx
 	in ig pl ([], cx)
 
+let rec print_context ctx =
+	match ctx with
+	| Player(_)::tl		 -> print_string "Player\n"; print_context tl
+	| Goal(_)::tl		 -> print_string "Goal\n"; print_context tl
+	| GravField(_)::tl		 -> print_string "GravField\n"; print_context tl
+	| Star(_)::tl		 -> print_string "Star\n"; print_context tl
+	| Bubble(_)::tl		 -> print_string "Bubble\n"; print_context tl
+	| Attractor(_)::tl		 -> print_string "Attractor\n"; print_context tl
+	| Wall(_)::tl		 -> print_string "Wall\n"; print_context tl
+	| Monster(_)::tl		 -> print_string "Monster\n"; print_context tl
+	| [] -> ()
+
 let rec game_loop context =
 	
 	match context with
 	| [] -> ()
 	| _ -> (draw_level context true) ; let nc = (iterate_game context) in game_loop nc
+	(*| _ -> print_context context ; let nc = (iterate_game context) in game_loop nc*)
