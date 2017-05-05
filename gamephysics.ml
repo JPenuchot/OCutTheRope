@@ -7,7 +7,7 @@
 open Basephysics
 open Gametypes
 
-let dt = 0.1
+let dt = 0.001
 
 (* Attraction vector formula *)
 let attract obj_pos attr_pos attr_str =

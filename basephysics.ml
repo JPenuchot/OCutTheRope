@@ -189,3 +189,6 @@ let ss_collide sa sb vel dt =
 
 let rope_collide rope pos vel =
     ()
+
+let string_of_pair (x, y) =
+    "(" ^ (string_of_float x) ^ ", " ^ (string_of_float y) ^ ")"

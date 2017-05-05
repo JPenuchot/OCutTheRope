@@ -1,9 +1,5 @@
-open Ppm
-open Render
+open Level
+open Basephysics
 open Gamemechanics
 
-(*	Load world	*)
-
-(*	Game loop	*)
-
-(*	End	*)
+let () = game_loop (loadLevel "levels/1.lvl")
