@@ -140,7 +140,7 @@ let loadObject str =
 				Player (
 					(((float_of_string playGroups.(4)), (float_of_string playGroups.(5))), (float_of_string playGroups.(6))),
 					((float_of_string playGroups.(8)), (float_of_string playGroups.(9))),
-					(loadModifiers playGroups.(11))
+					(if (Array.length playGroups) >= 12 then loadModifiers playGroups.(11) else [])
 				)
 	| "Go" -> let goalGroups = get_matched_groups (regexp regExpGoal) str in
 				Goal(
