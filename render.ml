@@ -45,7 +45,7 @@ let draw_single_element element =
     | Goal((posX, posY), _)                -> draw_image goal_sprite      (int_of_float posX) (int_of_float posY)
     | Star((posX, posY), radius)           -> draw_image star_sprite      (int_of_float (posX-.radius)) (int_of_float (posY-.radius))
     | Bubble(((posX, posY), radius), _)    -> draw_image bubble_sprite    (int_of_float (posX-.radius)) (int_of_float (posY-.radius))
-    | Attractor((posX, posY), _)           -> draw_image attractor_sprite (int_of_float posX) (int_of_float posY)
+    | Attractor((posX, posY), _)           -> draw_image attractor_sprite (int_of_float (posX-.25.)) (int_of_float (posY-.25.))
     | Wall((posX, posY), _)                -> draw_image wall_sprite      (int_of_float posX) (int_of_float posY)
     | Monster((posX, posY), _)             -> draw_image monster_sprite   (int_of_float posX) (int_of_float posY)
     | _                                    -> ()

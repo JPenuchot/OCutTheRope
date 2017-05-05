@@ -1,4 +1,4 @@
-(*	GAMEMECHANICS.ML
+(*	EDITOR.ML
  *	
  *	Creativity funnel.
  *	Allow you to create your own levels.
@@ -34,22 +34,29 @@ let draw_menu drawPlayer =
 	draw_image goal_sprite 522 170;
 	draw_image monster_sprite 510 40
 
-exception NoPointedObject
-
 (* Detect if a point is in an given game object *)
-let pointIsInObject pX pY o =
+let pointIsInObject pointX pointY o =
+	let pX = float_of_int pointX in
+	let pY = float_of_int pointY in
 	match o with
-	| Player((((x, y), radius), _, _)) -> sqrt
+	| Player((((x, y), radius), _, _))   -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
+	| Star(((x, y), radius))             -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
+	| Attractor((x, y), _)               -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= 25. (* Attractor has only the size of its sprite *)
+	| Bubble(((x, y), radius), _)        -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
+	| Goal(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| Wall(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| Monster(((x, y), (width, height))) -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| _                                  -> false
 
 (* Detect the element under the mouse *)
 let rec getPointedObject x y level =
 	match level with
-	| o::q -> o
-	| [] -> raise NoPointedObject
+	| o::q -> if (pointIsInObject x y o) then (true, o) else getPointedObject x y q
+	| [] -> (false, GravField(0.,0.)) (* Return a dummy object (will not be used due to false as first value) *)
 
 (* Drag an objet until mouse released *)
-let dragObject o =
-	()
+let rec dragObject o level =
+	Printf.printf "dragObject\n%!"
 
 (* Main function, will be called reccursivly *)
 let rec main level =
@@ -62,15 +69,17 @@ let rec main level =
 		synchronize ();
 		
 		(* Wait for a drag *)
-		let event = wait_next_event [Button_down] in
+		wait_next_event [Button_down];
 
 		(* We must caught an exception because getPointedObjet may raise NoPointedObject *)
-		try
+		let pointed = getPointedObject (fst (mouse_pos())) (snd (mouse_pos())) level in
 
-			dragObject (getPointedObject 0 0 level)
-		with NoPointedObject -> ();
+		(* If we are on an object *)
+		if fst pointed then
+			dragObject (snd pointed) level;
 
 		(* Reccursivly call the main editor function *)
+		Printf.printf "Reccursivly\n%!";
 		main level
 
 	(* Caught the graphics exceptions (for example window closing) *)
