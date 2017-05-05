@@ -18,10 +18,10 @@ let attract obj_pos attr_pos attr_str =
 let acc_of_context (pos, _, _, _) ctx =
 	let rec aoc ctx acc =
 		match ctx with
-		| GravField(a)::tl			-> aoc tl (a +.. acc)
-		| Attractor(xy,str)::tl		-> aoc tl ((attract pos xy str) +.. acc)
-		| _::tl						-> aoc tl acc
-		| []						-> acc
+		| GravField(a)::tl		-> aoc tl (a +.. acc)
+		| Attractor(xy,str)::tl	-> aoc tl ((attract pos xy str) +.. acc)
+		| _::tl					-> aoc tl acc
+		| []					-> acc
 	in aoc ctx (0., 0.)
 
 (* Computes acceleration for a given player given its velocity, position and modifiers *)
