@@ -33,6 +33,6 @@ type context = gameObject list
 
 (* Those are thrown when the game ends. They contain the number of points the player earned. *)
 type kindEnd =
-	| Win	of int
-	| Die	of int
+	| Win
+	| Die
 exception EndGame of kindEnd
