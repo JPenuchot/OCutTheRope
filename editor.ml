@@ -39,7 +39,7 @@ exception NoPointedObject
 (* Detect if a point is in an given game object *)
 let pointIsInObject pX pY o =
 	match o with
-	| Player((((x, y), radius), _, _)) -> sqrt()
+	| Player((((x, y), radius), _, _)) -> sqrt
 
 (* Detect the element under the mouse *)
 let rec getPointedObject x y level =
