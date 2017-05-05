@@ -10,7 +10,7 @@ open Gametypes
 
 (* The regular expression to match the object in a line *)
 let regExpFloat =
-	"\\(\\(-\\)?[0-9]+\\.[0-9]*\\)"
+	"\\(\\-?[0-9]+\\.[0-9]*\\)"
 (* Types from basephysics.ml *)
 let regExpPos =
 	"\\((" ^ regExpFloat ^ "," ^ regExpFloat ^ ")\\)"
