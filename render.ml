@@ -9,11 +9,14 @@ open Ppm
 open Level
 open Gametypes
 
-(* Open a graphic window *)
-let () = open_graph " 500x700";
-
-(* Enable double buffering, use "synchronize()" to update window *)
-auto_synchronize false
+let () = 
+    (* Open a graphic window with the size depending on the running programm *)
+    if (String.sub Sys.executable_name 2 6) = "editor" then
+        open_graph " 620x700"
+    else
+        open_graph " 500x700";
+    (* Enable double buffering, use "synchronize()" to update window *)
+    auto_synchronize false
 
 (* Load pictures *)
 let background =
