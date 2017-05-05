@@ -29,4 +29,7 @@ test:
 expe: 		
 	$(OCB) -tag debug expe.byte
 
+America great again:
+	@echo We will build a wall! And Mexico will pay.
+
 .PHONY: 	all clean byte native profile debug tests
