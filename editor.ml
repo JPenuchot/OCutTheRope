@@ -15,31 +15,7 @@ let level =
 	if (Array.length Sys.argv) >= 2 then
 		loadLevel Sys.argv.(1)
 	else
-		[]
-
-(* Update the position of a gameObject *)
-let updatePosition o x y =
-	match o with
-	| Player(((_, a), b, c)) -> Player((((x, y), a), b, c))
-	| Star((_, a))           -> Star(((x, y), a))
-	| Attractor(_, a)        -> Attractor((x, y), a)
-	| Bubble((_, a), b)      -> Bubble(((x, y), a), b)
-	| Goal((_, a))           -> Goal(((x, y), a))
-	| Wall((_, a))           -> Wall(((x, y), a))
-	| Monster((_, a))        -> Monster(((x, y), a))
-	| _                      -> o
-
-(* Return the position of an object (left-bottom, not middle for circles) *)
-let objectPosition o =
-	match o with
-	| Player((((x, y), _), _, _)) -> (int_of_float x, int_of_float y)
-	| Star(((x, y), _))           -> (int_of_float x, int_of_float y)
-	| Attractor((x, y), _)        -> (int_of_float x, int_of_float y)
-	| Bubble(((x, y), _), _)      -> (int_of_float x, int_of_float y)
-	| Goal(((x, y), _))           -> (int_of_float x, int_of_float y)
-	| Wall(((x, y), _))           -> (int_of_float x, int_of_float y)
-	| Monster(((x, y), _))        -> (int_of_float x, int_of_float y)
-	| _                           -> (0, 0)
+		failwith "You must specify a level file!"
 
 (* Check if a player is in the level *)
 let rec containsPlayer level =
@@ -58,25 +34,10 @@ let draw_menu drawPlayer =
 	draw_image goal_sprite 522 170;
 	draw_image monster_sprite 510 40
 
-(* Detect if a point is in an given game object *)
-let pointIsInObject pointX pointY o =
-	let pX = float_of_int pointX in
-	let pY = float_of_int pointY in
-	match o with
-	| Player((((x, y), radius), _, _))   -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
-	| Star(((x, y), radius))             -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
-	| Attractor((x, y), _)               -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= 25. (* Attractor has only the size of its sprite *)
-	| Bubble(((x, y), radius), _)        -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
-	| Goal(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
-	| Wall(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
-	| Monster(((x, y), (width, height))) -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
-	| _                                  -> false
-
 (* Detect the element under the mouse *)
 let rec getPointedObject x y level =
-	match level with
-	| o::q -> if (pointIsInObject x y o) then (true, o) else getPointedObject x y q
-	| [] -> (false, GravField(0.,0.)) (* Return a dummy object (will not be used due to false as first value) *)
+	(* Fold from left to find the last object pointed in the list *)
+	List.fold_left (fun last el -> if (pointIsInObject x y el) then (true, el) else last) (false, GravField(0.,0.)) level
 
 (* Drag an objet until mouse released
  * @params: o     The object to move
@@ -88,20 +49,66 @@ let rec dragObject o level rX rY =
 	let event = wait_next_event [Button_up; Mouse_motion] in
 	(* If the mouse button is still pressed *)
 	if event.button then begin
-		(* Remove the object from the list and add the new moved object *)
+		(* Create the new moved object (only on a mutiple of 5) *)
 		let newObject = updatePosition o (float_of_int ((event.mouse_x-rX)/5*5)) (float_of_int ((event.mouse_y-rY)/5*5)) in
-		let newLevel = (List.filter (fun e -> e <> o) level)@[newObject] in
 		(* Redraw the level *)
 		draw_level level false;
 		draw_menu (not (containsPlayer level));
 		synchronize ();
-		(* Reccursive call *)
-		dragObject newObject newLevel rX rY
+		(* Reccursive call with the context where the old object is replaced with the new one *)
+		dragObject newObject ((removeFromLevel o level)@[newObject]) rX rY
 	end else level
+
+(* Search for a click an a new object *)
+let checkNewObject level =
+	let pX = fst (mouse_pos()) in
+	let pY = snd (mouse_pos()) in
+	if ((not (containsPlayer level)) && (pointIsInObject pX pY (Player(((560.,645.),25.),(0.,0.),[])))) then
+		let newObject = Player(((560.,645.),25.),(0.,0.),[]) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-645)
+	else if (pointIsInObject pX pY (Star(((560., 485.), 25.)))) then
+		let newObject = Star(((560., 485.), 25.)) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-485)
+	else if (pointIsInObject pX pY (Attractor((560.,405.),0.))) then
+		let newObject = Attractor((560.,405.),0.) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-405)
+	else if (pointIsInObject pX pY (Bubble(((560.,565.),25.),(0.,0.)))) then
+		let newObject = Bubble(((560.,565.),25.),(0.,0.)) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-565)
+	else if (pointIsInObject pX pY (Goal(((522.,170.),(75.,100.))))) then
+		let newObject = Goal(((522.,170.),(75.,100.))) in
+		dragObject newObject (level@[newObject]) (pX-522) (pY-170)
+	else if (pointIsInObject pX pY (Wall(((535.,300.),(50.,50.))))) then
+		let newObject = Wall(((535.,300.),(50.,50.))) in
+		dragObject newObject (level@[newObject]) (pX-535) (pY-300)
+	else if (pointIsInObject pX pY (Monster(((510.,40.),(100.,100.))))) then
+		let newObject = Monster(((510.,40.),(100.,100.))) in
+		dragObject newObject (level@[newObject]) (pX-510) (pY-40)
+	else
+		level
+
+(* Remove the objects out of the level 
+ * Warning: not terminal reccursive :'( *)
+let rec removeOutObjects level =
+	match level with
+	| o::q -> (
+		let pos = objectPosition o in
+		if (fst pos) < 0 || (fst pos) > 500 || (snd pos) < 0 || (snd pos) > 700 then
+			removeOutObjects q
+		else
+			o::(removeOutObjects q)
+	)
+	| []   -> level
 
 (* Main function, will be called reccursivly *)
 let rec main level =
 	try
+
+		(* Remove objects out of the level *)
+		let level =
+			removeOutObjects level
+		in
+
 		(* Draw the level without displaying it *)
 		draw_level level false;
 		
@@ -125,11 +132,19 @@ let rec main level =
 			main newLevel
 		end else
 
-			(* Reccursivly call the main editor function *)
-			main level;
+			(* Check if we must add a new game object and reccursivly call the main editor function *)
+			main (checkNewObject level);
 
 	(* Caught the graphics exceptions (for example window closing) *)
-	with Graphics.Graphic_failure(_) -> ()
+	with Graphics.Graphic_failure(_) ->
+		(* Save the level (and add a gravity field) *)
+		let isGravity =
+			List.exists (fun e -> match e with | GravField(_) -> true | _ -> false) level
+		in
+		if isGravity then
+			saveLevel level Sys.argv.(1)
+		else
+			saveLevel ((GravField((0.,-1.)))::level) Sys.argv.(1)
 
 let () =
 	main level
