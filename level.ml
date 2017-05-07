@@ -125,6 +125,10 @@ let pointIsInObject pointX pointY o =
 let removeFromLevel obj level =
 	List.filter (fun e -> e <> obj) level
 
+(* Remove a modifier from a list *)
+let removeModifier m modifierList =
+	List.filter (fun e -> e <> m) modifierList
+
 (* Return an array of string representing the result of matched_group for a given regexp *)
 let get_matched_groups exp str =
 	(* Match the string for using matched_group *)

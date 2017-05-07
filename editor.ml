@@ -39,6 +39,15 @@ let rec getPointedObject x y level =
 	(* Fold from left to find the last object pointed in the list *)
 	List.fold_left (fun last el -> if (pointIsInObject x y el) then (true, el) else last) (false, GravField(0.,0.)) level
 
+(* Detect the rope origin under the mouse *)
+let getPointedRope x y m =
+	List.fold_left (
+		fun last el ->
+			match el with
+			| Roped(((rX, rY), _, _)) -> if (sqrt((rX-.x)**2. +. (rY-.y)**2.) <= 5.) then (true, el) else last
+			| _                       -> last
+	) (false, Point) m
+
 (* Drag an objet until mouse released
  * @params: o     The object to move
  *          level The current context
@@ -57,6 +66,39 @@ let rec dragObject o level rX rY =
 		synchronize ();
 		(* Reccursive call with the context where the old object is replaced with the new one *)
 		dragObject newObject ((removeFromLevel o level)@[newObject]) rX rY
+	end else level
+
+(* Update the posotion of a rope *)
+let updateRopePosition r nX nY =
+	match r with
+	| Roped((_, a, b)) -> Roped(((nX, nY), a, b))
+	| _                -> r
+
+(* Replace a rope in a player *)
+let replaceRope oldRope newRope p =
+	(* Creates the new list *)
+	let lastModifiers = match p with | Player((_, _, l)) -> l | _ -> [] in
+	let newModifiers = (removeModifier oldRope lastModifiers)@[newRope] in
+	(* Create the new player *)
+	match p with
+	| Player((a, b, _)) -> Player((a, b, newModifiers))
+	| _                 -> p
+
+(* Drag a rope for the player *)
+let rec dragRope r level p =
+	let event = wait_next_event [Button_up; Mouse_motion] in
+	(* If the mouse button is still pressed *)
+	if event.button then begin
+		(* Create the new Roped object (only on a mutiple of 5) *)
+		let newRope = updateRopePosition r (float_of_int (event.mouse_x/5*5)) (float_of_int (event.mouse_y/5*5)) in
+		(* Create a player with the updated rope *)
+		let newPlayer = replaceRope r newRope p in
+		(* Redraw the level *)
+		draw_level level false;
+		draw_menu (not (containsPlayer level));
+		synchronize ();
+		(* Reccursive call with the context where the old player is replaced with the new one *)
+		dragRope newRope ((removeFromLevel p level)@[newPlayer]) newPlayer
 	end else level
 
 (* Search for a click an a new object *)
@@ -119,7 +161,7 @@ let rec main level =
 		(* Wait for a drag *)
 		let event = wait_next_event [Button_down] in
 
-		(* We must caught an exception because getPointedObjet may raise NoPointedObject *)
+		(* This will be a pair, the first value is a boolean that indicates if an object is pointed *)
 		let pointed = getPointedObject (fst (mouse_pos())) (snd (mouse_pos())) level in
 
 		(* If we are on an object *)
@@ -130,10 +172,30 @@ let rec main level =
 			let newLevel = dragObject (snd pointed) level (event.mouse_x-(fst objectPos)) (event.mouse_y-(snd objectPos)) in
 			(* Reccursive call on the new level *)
 			main newLevel
-		end else
+		end else begin
+
+			(* If the mouse doesn't point a gameObject, we must check if it points a player modifier (a rope) *)
+			if (containsPlayer level) then begin
+
+				(* Get the player *)
+				let levelPlayer = List.find (fun e -> match e with | Player(_) -> true | _ -> false) level in
+				let playerModifiers = match levelPlayer with | Player(_, _, m) -> m | _ -> [] in
+
+				(* Get the pointed rope *)
+				let ropePointed = getPointedRope (float_of_int (fst (mouse_pos()))) (float_of_int (snd (mouse_pos()))) playerModifiers in
+
+				(* Drag it if there is one *)
+				if (fst ropePointed) then begin
+					let newLevel = dragRope (snd ropePointed) level levelPlayer in
+					main newLevel
+				end
+
+			end;
 
 			(* Check if we must add a new game object and reccursivly call the main editor function *)
 			main (checkNewObject level);
+
+		end
 
 	(* Caught the graphics exceptions (for example window closing) *)
 	with Graphics.Graphic_failure(_) ->
@@ -144,7 +206,8 @@ let rec main level =
 		if isGravity then
 			saveLevel level Sys.argv.(1)
 		else
-			saveLevel ((GravField((0.,-1.)))::level) Sys.argv.(1)
+			saveLevel ((GravField((0.,-1.)))::level) Sys.argv.(1);
+		exit 0
 
 let () =
 	main level

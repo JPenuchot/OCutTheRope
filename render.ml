@@ -51,7 +51,8 @@ type typePlayerInfos = {
 (* TODO: Implémenter ici le dessin de la corde *)
 let draw_line (x1, y1) (x2, y2) length =
     moveto (int_of_float x1) (int_of_float y1);
-    lineto (int_of_float x2) (int_of_float y2)
+    lineto (int_of_float x2) (int_of_float y2);
+    fill_circle (int_of_float x2) (int_of_float y2) 5
 
 (* Draw the modifiers of a player *)
 let rec draw_modifiers p m =
