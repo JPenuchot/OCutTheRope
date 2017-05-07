@@ -26,7 +26,10 @@ let rec containsPlayer level =
 
 (* Function to draw each game object in the right menu *)
 let draw_menu drawPlayer =
-	if drawPlayer then draw_image player_sprite 535 620;
+	if drawPlayer then
+		draw_image player_sprite 535 620
+	else
+		fill_circle 560 645 5;
 	draw_image bubble_sprite 535 540;
 	draw_image star_sprite 535 460;
 	draw_image attractor_sprite 535 380;
@@ -69,9 +72,12 @@ let rec dragObject o level rX rY =
 	end else level
 
 (* Update the posotion of a rope *)
-let updateRopePosition r nX nY =
+let updateRopePosition r nX nY p =
+	(* We need the player position to calculate the length of the rope *)
+	let playerPos = objectPosition p in
+	(* Do it! *)
 	match r with
-	| Roped((_, a, b)) -> Roped(((nX, nY), a, b))
+	| Roped((_, a, b)) -> Roped(((nX, nY), (sqrt (((float_of_int (fst playerPos)) -. nX)**2. +. ((float_of_int (snd playerPos)) -. nY)**2.)), b))
 	| _                -> r
 
 (* Replace a rope in a player *)
@@ -84,13 +90,34 @@ let replaceRope oldRope newRope p =
 	| Player((a, b, _)) -> Player((a, b, newModifiers))
 	| _                 -> p
 
+(* Add a rope to a player *)
+let addRope newRope p =
+	match p with
+	| Player((a, b, c)) -> Player((a, b, (c@[newRope])))
+	| _                 -> p
+
+(* Remove ropes out for a player *)
+let removeOutRopes p =
+	(* Remove out ropes from a modifier list *)
+	let rop m =
+		List.filter (
+			fun e ->
+				match e with
+				| Roped(((x, y), _, _)) -> x >= 0. && x <= 500. && y >= 0. && y <= 700.
+				| _                     -> true
+		) m
+	in
+	match p with
+	| Player((a,b,c)) -> Player((a, b, (rop c)))
+	| _ -> p
+
 (* Drag a rope for the player *)
 let rec dragRope r level p =
 	let event = wait_next_event [Button_up; Mouse_motion] in
 	(* If the mouse button is still pressed *)
 	if event.button then begin
 		(* Create the new Roped object (only on a mutiple of 5) *)
-		let newRope = updateRopePosition r (float_of_int (event.mouse_x/5*5)) (float_of_int (event.mouse_y/5*5)) in
+		let newRope = updateRopePosition r (float_of_int (event.mouse_x/5*5)) (float_of_int (event.mouse_y/5*5)) p in
 		(* Create a player with the updated rope *)
 		let newPlayer = replaceRope r newRope p in
 		(* Redraw the level *)
@@ -105,9 +132,16 @@ let rec dragRope r level p =
 let checkNewObject level =
 	let pX = fst (mouse_pos()) in
 	let pY = snd (mouse_pos()) in
-	if ((not (containsPlayer level)) && (pointIsInObject pX pY (Player(((560.,645.),25.),(0.,0.),[])))) then
+	let playerIn = containsPlayer level in
+	if ((not playerIn) && (pointIsInObject pX pY (Player(((560.,645.),25.),(0.,0.),[])))) then
 		let newObject = Player(((560.,645.),25.),(0.,0.),[]) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-645)
+	else if (playerIn && (sqrt((560.-.(float_of_int pX))**2. +. (645.-.(float_of_int pY))**2.) <= 5.)) then
+		let newRope = Roped(((560.,645.),0.,0.)) in
+		let levelPlayer = getPlayer level in
+		let newPlayer = addRope newRope levelPlayer in
+		let newLevel = (removeFromLevel levelPlayer level)@[newPlayer] in
+		dragRope newRope newLevel newPlayer
 	else if (pointIsInObject pX pY (Star(((560., 485.), 25.)))) then
 		let newObject = Star(((560., 485.), 25.)) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-485)
@@ -129,7 +163,7 @@ let checkNewObject level =
 	else
 		level
 
-(* Remove the objects out of the level 
+(* Remove the objects (and ropes) out of the level
  * Warning: not terminal reccursive :'( *)
 let rec removeOutObjects level =
 	match level with
@@ -137,10 +171,15 @@ let rec removeOutObjects level =
 		let pos = objectPosition o in
 		if (fst pos) < 0 || (fst pos) > 500 || (snd pos) < 0 || (snd pos) > 700 then
 			removeOutObjects q
-		else
-			o::(removeOutObjects q)
+		else begin
+			(* Check if it's a player and if we need to check the ropes *)
+			if (match o with | Player(_) -> true | _ -> false) then
+				(removeOutRopes o)::(removeOutObjects q)
+			else
+				o::(removeOutObjects q)
+		end
 	)
-	| []   -> level
+	| [] -> level
 
 (* Main function, will be called reccursivly *)
 let rec main level =
@@ -178,7 +217,7 @@ let rec main level =
 			if (containsPlayer level) then begin
 
 				(* Get the player *)
-				let levelPlayer = List.find (fun e -> match e with | Player(_) -> true | _ -> false) level in
+				let levelPlayer = getPlayer level in
 				let playerModifiers = match levelPlayer with | Player(_, _, m) -> m | _ -> [] in
 
 				(* Get the pointed rope *)

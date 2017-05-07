@@ -129,6 +129,10 @@ let removeFromLevel obj level =
 let removeModifier m modifierList =
 	List.filter (fun e -> e <> m) modifierList
 
+(* Get the player of a level *)
+let getPlayer level =
+	List.find (fun e -> match e with | Player(_) -> true | _ -> false) level
+
 (* Return an array of string representing the result of matched_group for a given regexp *)
 let get_matched_groups exp str =
 	(* Match the string for using matched_group *)
