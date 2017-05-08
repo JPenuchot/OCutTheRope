@@ -77,7 +77,7 @@ let updateRopePosition r nX nY p =
 	let playerPos = objectPosition p in
 	(* Do it! *)
 	match r with
-	| Roped((_, a, b)) -> Roped(((nX, nY), (sqrt (((float_of_int (fst playerPos)) -. nX)**2. +. ((float_of_int (snd playerPos)) -. nY)**2.)), b))
+	| Roped((_, _, b)) -> Roped(((nX, nY), (sqrt (((float_of_int (fst playerPos)) -. nX)**2. +. ((float_of_int (snd playerPos)) -. nY)**2.))+.50., b))
 	| _                -> r
 
 (* Replace a rope in a player *)

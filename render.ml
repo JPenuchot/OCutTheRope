@@ -48,11 +48,66 @@ type typePlayerInfos = {
 }
 
 (* Draw a line bewteen two pos with a specified length *)
-(* TODO: Implémenter ici le dessin de la corde *)
-let draw_line (x1, y1) (x2, y2) length =
-    moveto (int_of_float x1) (int_of_float y1);
-    lineto (int_of_float x2) (int_of_float y2);
-    fill_circle (int_of_float x2) (int_of_float y2) 5
+(* The parameter inv is used to know if the points as been inverted (set false by default) *)
+let rec drawRope (x1, y1) (x2, y2) l inv =
+    (* Check for a too long rope *)
+    let tooLong = (sqrt((x2-.x1)**2. +. (y2-.y1)**2.)) > l in
+    (* Check for a verticle rope *)
+    if ((x1 = x2) || tooLong) then begin
+        if tooLong then set_color 0xFF0000;
+        let ix1 = int_of_float x1 in
+        let ix2 = int_of_float x2 in
+        let iy1 = int_of_float y1 in
+        let iy2 = int_of_float y2 in
+        let il = int_of_float l in
+        draw_circle ix1 iy1 5;
+        draw_circle ix2 iy2 5;
+        if (iy1 > iy2) then begin
+            moveto ix1 iy1;
+            lineto ix2 (if tooLong then iy2 else iy2 - (il-(iy1-iy2))/2)(* Add the rope remaining *)
+        end else begin
+            moveto ix2 iy2;
+            lineto ix1 (if tooLong then iy1 else iy1 - (il-(iy2-iy1))/2)(* Add the rope remaining *)
+        end;
+        if tooLong then set_color 0x000000;
+    end
+    (* Rearange the points *)
+    else if (x2 < x1) then
+        drawRope (x2,y2) (x1,y1) l (not inv)
+    else begin
+        (* Compute z *)
+        let rec computeZ z =
+            if (((sinh z) /. z) < ((sqrt (l**2. -. (y2-.y1)**2.)) /. (x2-.x1))) then
+                computeZ (z +. 0.001)
+            else
+                z
+        in
+        let z = computeZ 0.001 in
+        (* Calculate the curve parameters *)
+        let a = (x2 -. x1) /. 2. /. z in
+        let p = (x1+.x2-.a*.(log ( (l+.y2-.y1) /. (l-.y2+.y1) ))) /. 2. in
+        let q = (y2+.y1-.l*.(cosh z)/.(sinh z)) /. 2. in
+        (* A function to draw a curve from a given function *)
+        let rec drawCurve fromX toX step func =
+            lineto (int_of_float fromX) (int_of_float (func fromX));
+            if (fromX < toX) then
+                drawCurve (fromX +. step) toX step func
+            else
+                ()
+        in
+        (* The function *)
+        let f x =
+            a *. (cosh ((x-.p)/.a)) +. q
+        in
+        (* Draw the curve that corresponds to the rope *)
+        if inv then
+            draw_circle (int_of_float x1) (int_of_float y1) 5
+        else
+            draw_circle (int_of_float x2) (int_of_float y2) 5;
+        moveto (int_of_float x1) (int_of_float y1);
+        drawCurve x1 x2 1. f
+    end
+
 
 (* Draw the modifiers of a player *)
 let rec draw_modifiers p m =
@@ -67,7 +122,7 @@ let rec draw_modifiers p m =
     | h::q -> (
         match h with
         | Bubbled(_)           -> draw_image bubbled_sprite (int_of_float (playerInfos.x-.playerInfos.r)) (int_of_float (playerInfos.y-.playerInfos.r))
-        | Roped(((x,y),len,_)) -> draw_line (playerInfos.x, playerInfos.y) (x, y) len 
+        | Roped(((x,y),len,_)) -> drawRope (playerInfos.x, playerInfos.y) (x, y) len false
         | _                    -> ()
     ); draw_modifiers p q
     | []   -> ()
