@@ -47,6 +47,9 @@ let ( **. ) a (x, y) =
 let ( //. ) (x, y) a =
     (x /. a, y /. a)
 
+let len_of_vec_sq (x, y) = 
+    (x ** 2.) +. (y ** 2.)
+
 (* Returns the length of a vector *)
 let len_of_vec (x, y) = 
     sqrt ((x *. x) +. (y *. y))
@@ -72,15 +75,17 @@ let apply_der (x, y) (xx, yy) dt =
 (* Checks for collision between a sphere and the corner of a rectangle. *)
 let check_col_corner_sr sp re =
     let (spos, srad) = sp in
+    let srad_sq = srad ** 2. in
     let ((rx, ry), (rw, rh)) = re in
-    len_of_vec (spos -.. (rx, ry)) < srad ||
-    len_of_vec (spos -.. (rx, ry +. rh)) < srad ||
-    len_of_vec (spos -.. (rx +. rw, ry)) < srad ||
-    len_of_vec (spos -.. (rx +. rw, ry +. rh)) < srad
+    len_of_vec_sq (spos -.. (rx, ry)) < srad_sq ||
+    len_of_vec_sq (spos -.. (rx, ry +. rh)) < srad_sq ||
+    len_of_vec_sq (spos -.. (rx +. rw, ry)) < srad_sq ||
+    len_of_vec_sq (spos -.. (rx +. rw, ry +. rh)) < srad_sq
 
 (* Checks for collision between a sphere and the face of a rectangle. *)
-let check_col_wall_sr sp re =
+let check_col_wall_sr ((sx, sy), srad) ((rx, ry), (rw, rh)) =
     false
+    (*(sx < rx + rw && )*)
 
 (* Checks for collision between two spheres. *)
 let check_col_ss spa spb =
@@ -148,13 +153,13 @@ let sr_wall_collide s r vel =
             let ((cor1, idv1), (cor2, idv2), len1, len2) = acc in
             match lst with
             | (cor, idv)::tl ->
-                let len = len_of_vec (cor -.. spos) in
-                if      len < len1 then find2closest tl ((cor, idv), (cor1, idv1), len, len1)
-                else if len < len2 then find2closest tl ((cor1, idv1), (cor, idv), len1, len)
+                let len = len_of_vec_sq (cor -.. spos) in
+                if      (len < len1) then find2closest tl ((cor, idv), (cor1, idv1), len, len1)
+                else if (len < len2) then find2closest tl ((cor1, idv1), (cor, idv), len1, len)
                 else find2closest tl ((cor1, idv1), (cor2, idv2), len1, len2)
             | [] -> (idv1, idv2)
-        
         in let (idv1, idv2) = find2closest corlist (((0., 0.), 0), ((0., 0.), 0), max_float, max_float) in
+
         let (sx, sy) = spos in
         let (norm, dist) =
         if (idv1 == 0 && idv2 == 1) || (idv1 == 1 && idv2 == 0) then (* GAUCHE *)
