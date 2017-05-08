@@ -53,9 +53,11 @@ let rec print_context ctx =
 	| Monster(_)::tl		-> print_string "Monster\n"; print_context tl
 	| [] -> ()
 
-let rec game_loop context =
-	
+let rec game_loop context it =
 	match context with
 	| [] -> ()
-	| _ -> (draw_level context true) ; let nc = (iterate_game context) in game_loop nc
-	(*| _ -> print_context context ; let nc = (iterate_game context) in game_loop nc*)
+	| _ -> if (it mod 1000 == 0)	then (draw_level context true)
+								else ()
+		;let nc = (iterate_game context) in game_loop nc (it + 1)
+
+	(*| _ -> print_context context ; let nc = (iterate_game context) in game_loop nc (it + 1)*)
