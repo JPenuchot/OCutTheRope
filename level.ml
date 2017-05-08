@@ -77,6 +77,62 @@ let rec print_groups str n =
 	Printf.printf "print_groups:%s\n" (matched_group n str);
 	print_groups str (n+1)
 
+(* Check if a string contains a substring *)
+let contains s1 s2 =
+	let re = Str.regexp_string s2 in
+	try ignore (Str.search_forward re s1 0); true
+	with Not_found -> false
+
+(* Return the position of an object *)
+let objectPosition o =
+	match o with
+	| Player((((x, y), _), _, _)) -> (int_of_float x, int_of_float y)
+	| Star(((x, y), _))           -> (int_of_float x, int_of_float y)
+	| Attractor((x, y), _)        -> (int_of_float x, int_of_float y)
+	| Bubble(((x, y), _), _)      -> (int_of_float x, int_of_float y)
+	| Goal(((x, y), _))           -> (int_of_float x, int_of_float y)
+	| Wall(((x, y), _))           -> (int_of_float x, int_of_float y)
+	| Monster(((x, y), _))        -> (int_of_float x, int_of_float y)
+	| _                           -> (0, 0)
+
+(* Update the position of a gameObject *)
+let updatePosition o x y =
+	match o with
+	| Player(((_, a), b, c)) -> Player((((x, y), a), b, c))
+	| Star((_, a))           -> Star(((x, y), a))
+	| Attractor(_, a)        -> Attractor((x, y), a)
+	| Bubble((_, a), b)      -> Bubble(((x, y), a), b)
+	| Goal((_, a))           -> Goal(((x, y), a))
+	| Wall((_, a))           -> Wall(((x, y), a))
+	| Monster((_, a))        -> Monster(((x, y), a))
+	| _                      -> o
+
+(* Detect if a point is in an given game object *)
+let pointIsInObject pointX pointY o =
+	let pX = float_of_int pointX in
+	let pY = float_of_int pointY in
+	match o with
+	| Player((((x, y), radius), _, _))   -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
+	| Star(((x, y), radius))             -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
+	| Attractor((x, y), _)               -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= 25. (* Attractor has only the size of its sprite *)
+	| Bubble(((x, y), radius), _)        -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
+	| Goal(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| Wall(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| Monster(((x, y), (width, height))) -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| _                                  -> false
+
+(* Remove an object from a level *)
+let removeFromLevel obj level =
+	List.filter (fun e -> e <> obj) level
+
+(* Remove a modifier from a list *)
+let removeModifier m modifierList =
+	List.filter (fun e -> e <> m) modifierList
+
+(* Get the player of a level *)
+let getPlayer level =
+	List.find (fun e -> match e with | Player(_) -> true | _ -> false) level
+
 (* Return an array of string representing the result of matched_group for a given regexp *)
 let get_matched_groups exp str =
 	(* Match the string for using matched_group *)
@@ -189,7 +245,16 @@ let loadLevel file =
 				level
 		end;
 	in
-	read_file (open_in file) true []
+	(* Catch the exception when a file doesn't exists *)
+	try
+		read_file (open_in file) true []
+	with Sys_error(_) ->
+		(* If we're in the level editor, we can use an unexisting file *)
+		if (contains Sys.executable_name "editor") then
+			[]
+		else
+			failwith "Unable to open file!"
+
 
 (* Transforms modifiers to string *)
 let modifiers2String m =
@@ -201,7 +266,7 @@ let modifiers2String m =
 			| Roped(((a,b),c,d)) -> m2s ("Roped(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ "));" ^ s) q
 			| Point              -> m2s ("Point;" ^ s) q
 		)
-		| [] -> (sub s 0 ((length s)-1)) (* Remove the last semicolon *)
+		| [] -> (sub s 0 (max 0 ((length s)-1))) (* Remove the last semicolon *)
 	in
 	m2s "" m
 
