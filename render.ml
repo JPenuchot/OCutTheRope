@@ -60,8 +60,10 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
         let iy1 = int_of_float y1 in
         let iy2 = int_of_float y2 in
         let il = int_of_float l in
-        draw_circle ix1 iy1 5;
-        draw_circle ix2 iy2 5;
+        if inv then
+            fill_circle ix1 iy1 5
+        else
+            fill_circle ix2 iy2 5;
         if (iy1 > iy2) then begin
             moveto ix1 iy1;
             lineto ix2 (if tooLong then iy2 else iy2 - (il-(iy1-iy2))/2)(* Add the rope remaining *)
@@ -101,9 +103,9 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
         in
         (* Draw the curve that corresponds to the rope *)
         if inv then
-            draw_circle (int_of_float x1) (int_of_float y1) 5
+            fill_circle (int_of_float x1) (int_of_float y1) 5
         else
-            draw_circle (int_of_float x2) (int_of_float y2) 5;
+            fill_circle (int_of_float x2) (int_of_float y2) 5;
         moveto (int_of_float x1) (int_of_float y1);
         drawCurve x1 x2 1. f
     end
