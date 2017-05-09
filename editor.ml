@@ -198,7 +198,11 @@ let rec main level =
 		synchronize ();
 		
 		(* Wait for a drag *)
-		let event = wait_next_event [Button_down] in
+		let event = wait_next_event [Button_down; Key_pressed] in
+
+		(* Print the key *)
+		if ((Char.code event.key) = 27) then
+			raise (Graphic_failure("Game closed with escape."));
 
 		(* This will be a pair, the first value is a boolean that indicates if an object is pointed *)
 		let pointed = getPointedObject (fst (mouse_pos())) (snd (mouse_pos())) level in
