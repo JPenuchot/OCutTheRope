@@ -8,6 +8,9 @@
  * by Théophile Walter
  */
 
+// We don't display HTML but text
+header("Content-Type: text/plain");
+
 // Print an error message and exit
 function error($message) {
 	echo "error:$message";
@@ -27,8 +30,20 @@ if (isset($_GET['getlist'])) {
 	 	}
 	 }
 
+} else if (isset($_GET['getlevel'])) {
+
+	// Check if the level exists
+	if (!ctype_alnum($_GET['getlevel']) || !file_exists("levels/".$_GET['getlevel'].".lvl")) {
+		error("This level does not exists!");
+	}
+
+	// Display the level
+	readfile("levels/".$_GET['getlevel'].".lvl");
+
+
+
 } else {
 
-	error();
+	error("You must specify the GET parameters \"getlist\" or \"getlevel\"!");
 
 }
