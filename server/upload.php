@@ -8,6 +8,9 @@
  * by Théophile Walter
  */
 
+// We don't display HTML but text
+header("Content-Type: text/plain");
+
 // Print an error message and exit
 function error($message) {
 	echo "error:$message";
@@ -22,6 +25,11 @@ if (!isset($_GET['level']) || !isset($_GET['level'])) {
 // Check the input
 if ($_GET['level'] === "" || $_GET['description'] === "") {
 	error("Empty parameter(s)!");
+}
+
+// Check the level file
+if (strpos($_GET['level'], "# OCutTheRope Level File 1.0") !== 0) {
+	error("Incorrect level file!")
 }
 
 // Saves the level

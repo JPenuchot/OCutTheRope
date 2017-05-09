@@ -226,13 +226,16 @@ let loadObject str =
 					))
 	| _    -> raise UnknowGameObject
 
+(* The level header *)
+let defaultLevelHeader = "# OCutTheRope Level File 1.0"
+
 (*	Level loading *)
 let loadLevel file =
 	(* Reccursive function to read the file *)
 	let rec read_file handle check_header level =
 		(* The file must have "# OCutTheRope Level File 1.0" on it's first line *)
 		if check_header then begin
-			if (input_line handle) <> "# OCutTheRope Level File 1.0" then
+			if (input_line handle) <> defaultLevelHeader then
 				failwith "Level file header not found or incorrect!";
 			read_file handle false level
 		end
@@ -288,7 +291,7 @@ let level2String level =
 		)
 		| [] -> str
 	in
-	matchGameObjects "# OCutTheRope Level File 1.0" level
+	matchGameObjects defaultLevelHeader level
 
 (* Save a level to a file *)
 let saveLevel level file =
