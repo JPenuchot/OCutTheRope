@@ -169,18 +169,18 @@ let sr_wall_collide s r vel =
         let (sx, sy) = spos in
         let (norm, dist) =
         if (idv1 == 0 && idv2 == 1) || (idv1 == 1 && idv2 == 0) then (* GAUCHE *)
-            ((-1.,0.), sx -. rx +. srad)
+            ((-1.,0.), (sx +. srad) -. rx)
         else if (idv1 == 0 && idv2 == 2) || (idv1 == 2 && idv2 == 0) then (* BAS *)
-            ((0.,-1.), sy -. ry +. srad)
+            ((0.,-1.), (sy +. srad) -. ry)
         else if (idv1 == 3 && idv2 == 1) || (idv1 == 1 && idv2 == 3) then (* HAUT *)
             ((0., 1.), ry +. rh -. (sy -. srad))
         else if (idv1 == 3 && idv2 == 2) || (idv1 == 2 && idv2 == 3) then (* DROITE *)
-            ((1., 0.), rx -. ry +. srad)
+            ((1., 0.), rx +. rw -. (sx -. srad))
         else
             raise (Failure "Wrong corner computation in sphere/rectangle wall collision.")
         in
         let (nvel, nspos) = (reflect norm vel, spos +.. (dist **. norm)) in
-        Printf.printf "WALL COLLIDE : norm = %s\n, dist = %f%!" (string_of_pair norm) dist;((nspos, srad), nvel)
+        ((nspos, srad), nvel)
     else
         (s, vel)
 
