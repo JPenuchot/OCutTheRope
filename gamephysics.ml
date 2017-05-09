@@ -27,8 +27,7 @@ let acc_of_context ((pos, _), _, _) ctx =
 
 (* Computes acceleration for a given player given its velocity, position and modifiers *)
 let acc_of_player_mod ((pos, _), vel, modifs) =
-	let norm = normalize vel in
-	let friction = (-1. *. friction_coef *. (len_of_vec_sq vel)) **. norm in
+	let friction = (-1. *. friction_coef *. (len_of_vec vel)) **. vel in
 	fold_left (fun acc m ->
 		match m with
 		| Bubbled(a)	-> (a +.. acc)

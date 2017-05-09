@@ -60,6 +60,7 @@ let len_of_vec (x, y) =
 let normalize (x, y) =
     let l = 1. /. (len_of_vec (x, y)) in
     l **. (x, y)
+    
 
 let string_of_pair (x, y) =
     "(" ^ (string_of_float x) ^ ", " ^ (string_of_float y) ^ ")"
