@@ -29,13 +29,12 @@ let acc_of_context ((pos, _), _, _) ctx =
 let acc_of_player_mod ((pos, _), vel, modifs) =
 	let norm = normalize vel in
 	let friction = (-1. *. friction_coef *. (len_of_vec_sq vel)) **. norm in
-	let rec aopm mods acc =
-		match mods with
-		| Bubbled(a)::tl	-> aopm tl (a +.. acc)
-		| Roped(r)::tl		-> aopm tl ((handle_rope_collision pos r) +.. acc)
-		| _::tl				-> aopm tl acc
-		| []				-> acc
-	in aopm modifs friction
+	fold_left (fun acc m ->
+		match m with
+		| Bubbled(a)	-> (a +.. acc)
+		| Roped(r)		-> ((handle_rope_collision pos r) +.. acc)
+		| _				-> acc
+	) friction modifs
 
 (* Computes the speed of a player given a context *)
 let vel_of_player player ctx =
@@ -45,16 +44,15 @@ let vel_of_player player ctx =
 
 (* Handles environment collisions then returns a new player and context. *)
 let handle_env_collision player context =
-	let rec hec (player, nc) context =
+	fold_left (fun (player, nc) context ->
 		let (sph, vel, m) = player in
 		match context with
-		| Star(s)::tl when (check_col_ss sph s)										-> hec ((sph, vel, Point::m), nc) tl
-		| Bubble(s, accel)::tl when (check_col_ss sph s)							-> hec ((sph, vel, (Bubbled(accel)::m)), nc) tl
-		| Goal(r)::tl when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Win))
-		| Wall(r)::tl ->
+		| Star(s) when (check_col_ss sph s)										-> ((sph, vel, Point::m), nc)
+		| Bubble(s, accel) when (check_col_ss sph s)							-> ((sph, vel, (Bubbled(accel)::m)), nc)
+		| Goal(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Win))
+		| Wall(r) ->
 				let (nsph, nvel) = sr_corner_collide sph r vel in
 				let (nnsph, nnvel) = sr_wall_collide nsph r nvel in
-				hec ((nnsph, nnvel, m), Wall(r)::nc) tl
-		| v::tl -> hec (player, (v::nc)) tl
-		| []	-> (player, nc)
-	in hec (player, []) context
+				((nnsph, nnvel, m), Wall(r)::nc)
+		| v -> (player, (v::nc))
+	) (player, []) context
