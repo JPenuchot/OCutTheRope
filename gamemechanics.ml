@@ -8,6 +8,7 @@ open Gametypes
 open Gamephysics
 open Basephysics
 open Render
+open List
 
 let iterate_player (sph, vel, modif) context =
 	let nvel = vel_of_player (sph, vel, modif) context in
@@ -18,12 +19,11 @@ let iterate_player (sph, vel, modif) context =
 
 (* Splits players and context into two different lists. *)
 let sep_players context =
-	let rec sp cx (pl, cn) =
+	fold_left (fun (pl, cn) cx ->
 		match cx with
-		| Player(p)::tl	-> sp tl (p::pl, cn)
-		| a::tl			-> sp tl (pl, a::cn)
-		| [] -> (pl, cn)
-	in sp context ([], [])
+		| Player(p)	-> (p::pl, cn)
+		| a			-> (pl, a::cn)
+	) ([], []) context
 
 (* Puts players back into the context. *)
 let rec fus_players pl cx =
@@ -41,16 +41,17 @@ let iterate_game context =
 	in ig pl ([], cx)
 
 let rec print_context ctx =
-	match ctx with
-	| Player(_)::tl			-> print_string "Player\n"; print_context tl
-	| Goal(_)::tl			-> print_string "Goal\n"; print_context tl
-	| GravField(_)::tl		-> print_string "GravField\n"; print_context tl
-	| Star(_)::tl			-> print_string "Star\n"; print_context tl
-	| Bubble(_)::tl			-> print_string "Bubble\n"; print_context tl
-	| Attractor(_)::tl		-> print_string "Attractor\n"; print_context tl
-	| Wall(_)::tl			-> print_string "Wall\n"; print_context tl
-	| Monster(_)::tl		-> print_string "Monster\n"; print_context tl
-	| [] -> ()
+	fold_left(fun _ v ->
+		match v with
+		| Player(_)			-> print_string "Player\n"
+		| Goal(_)			-> print_string "Goal\n"
+		| GravField(_)		-> print_string "GravField\n"
+		| Star(_)			-> print_string "Star\n"
+		| Bubble(_)			-> print_string "Bubble\n"
+		| Attractor(_)		-> print_string "Attractor\n"
+		| Wall(_)			-> print_string "Wall\n"
+		| Monster(_)		-> print_string "Monster\n"
+	) () ctx
 
 let rec game_loop context it =
 	match context with
