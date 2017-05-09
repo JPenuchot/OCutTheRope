@@ -9,6 +9,7 @@ Dependencies :
 
 -	OCaml Graphics (standard library)
 -	OCaml Str (standard library)
+-	[Cohttp](https://github.com/mirage/ocaml-cohttp), install with `opam install cohttp lwt js_of_ocaml`
 
 ## Build
 
