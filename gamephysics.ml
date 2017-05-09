@@ -6,8 +6,10 @@
 
 open Basephysics
 open Gametypes
+open List
 
 let dt = 0.00001
+let friction_coef = 0.01
 
 (* Attraction vector formula *)
 let attract obj_pos attr_pos attr_str =
@@ -16,23 +18,24 @@ let attract obj_pos attr_pos attr_str =
 
 (* Computes acceleration for a player given its position and the context *)
 let acc_of_context ((pos, _), _, _) ctx =
-	let rec aoc ctx acc =
-		match ctx with
-		| GravField(a)::tl		-> aoc tl (a +.. acc)
-		| Attractor(xy,str)::tl	-> aoc tl ((attract pos xy str) +.. acc)
-		| _::tl					-> aoc tl acc
-		| []					-> acc
-	in aoc ctx (0., 0.)
+	fold_left (fun acc c ->
+		match c with
+		| GravField(a)		-> (a +.. acc)
+		| Attractor(xy,str)	-> ((attract pos xy str) +.. acc)
+		| _					-> acc
+	) (0., 0.) ctx
 
 (* Computes acceleration for a given player given its velocity, position and modifiers *)
-let acc_of_player_mod ((pos, _), _, modifs) =
+let acc_of_player_mod ((pos, _), vel, modifs) =
+	let norm = normalize vel in
+	let friction = (-1. *. friction_coef *. (len_of_vec_sq vel)) **. norm in
 	let rec aopm mods acc =
 		match mods with
 		| Bubbled(a)::tl	-> aopm tl (a +.. acc)
 		| Roped(r)::tl		-> aopm tl ((handle_rope_collision pos r) +.. acc)
 		| _::tl				-> aopm tl acc
 		| []				-> acc
-	in aopm modifs (0., 0.)
+	in aopm modifs friction
 
 (* Computes the speed of a player given a context *)
 let vel_of_player player ctx =

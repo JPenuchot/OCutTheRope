@@ -7,6 +7,8 @@
 
 (* Base types *)
 
+let solid_bounce_coef = 0.9
+
 type size = float * float
 
 type pos = float * float
@@ -140,7 +142,7 @@ let sr_corner_collide s r vel =
 
         (* Then update sphere position *)
         let nspc = spc +.. ((slen -. dist) **. norm) in
-        print_string "CORNER COLLIDE\n%!"; ((nspc, slen),nvel)
+        ((nspc, slen),solid_bounce_coef **. nvel)
     else
         (s, vel)
 
@@ -180,7 +182,7 @@ let sr_wall_collide s r vel =
             raise (Failure "Wrong corner computation in sphere/rectangle wall collision.")
         in
         let (nvel, nspos) = (reflect norm vel, spos +.. (dist **. norm)) in
-        ((nspos, srad), nvel)
+        ((nspos, srad), solid_bounce_coef **. nvel)
     else
         (s, vel)
 
@@ -193,8 +195,8 @@ let ss_collide sa sb vel dt =
         let norm = normalize dist in
         let nvel = reflect norm vel in
         let ncoef = lena +. lenb -. (len_of_vec dist) in
-        let npos = (ncoef **. norm) +.. (dt **. nvel) +.. posa in
-        print_string "WALL COLLIDE\n%!"; ((npos, lena), nvel)
+        let npos = (ncoef **. norm) +.. posa in
+        ((npos, lena), solid_bounce_coef **. nvel)
     else
         (sa, vel)
 
