@@ -200,7 +200,7 @@ let rec main level =
 		(* Wait for a drag *)
 		let event = wait_next_event [Button_down; Key_pressed] in
 
-		(* Print the key *)
+		(* Bind the escape key to leave the editor *)
 		if ((Char.code event.key) = 27) then
 			raise (Graphic_failure("Game closed with escape."));
 
