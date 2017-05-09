@@ -153,34 +153,32 @@ let sr_wall_collide s r vel =
         let (spos, srad) = s in
         let ((rx, ry), (rw, rh)) = r in
 
-        let corlist = [ ((rx,ry), 0);                   (* BAS-GAUCHE *)
-                        ((rx,ry +. rh), 1);             (* HAUT-GAUCHE *)
-                        ((rx +. rw,ry), 2);             (* BAS-DROITE *)
-                        ((rx +. rw,ry +. rh), 3)] in    (* HAUT-DROITE *)
-
-        let rec find2closest lst acc =
+        let corlist = [ ((rx,ry), 0);                   
+                        ((rx,ry +. rh), 1);             
+                        ((rx +. rw,ry), 2);             
+                        ((rx +. rw,ry +. rh), 3)] in    
+        
+        let ((_,idv1), (_,idv2),_,_) = List.fold_left (fun acc elmt ->      (* Finding the two closest corners *)
             let ((cor1, idv1), (cor2, idv2), len1, len2) = acc in
-            match lst with
-            | (cor, idv)::tl ->
+            let (cor, idv) = elmt in
                 let len = len_of_vec_sq (cor -.. spos) in
-                if      (len < len1) then find2closest tl ((cor, idv), (cor1, idv1), len, len1)
-                else if (len < len2) then find2closest tl ((cor1, idv1), (cor, idv), len1, len)
-                else find2closest tl ((cor1, idv1), (cor2, idv2), len1, len2)
-            | [] -> (idv1, idv2)
-        in let (idv1, idv2) = find2closest corlist (((0., 0.), 0), ((0., 0.), 0), max_float, max_float) in
-
-        let (sx, sy) = spos in
+                if      (len < len1) then ((cor, idv), (cor1, idv1), len, len1)
+                else if (len < len2) then ((cor1, idv1), (cor, idv), len1, len)
+                else ((cor1, idv1), (cor2, idv2), len1, len2)
+        ) (((0., 0.), 0), ((0., 0.), 0), max_float, max_float) corlist in
+        
+        let (sx, sy) = spos in  (* Computing normal and getting the sphere out of the rectangle. *)
         let (norm, dist) =
-        if (idv1 == 0 && idv2 == 1) || (idv1 == 1 && idv2 == 0) then (* GAUCHE *)
-            ((-1.,0.), (sx +. srad) -. rx)
-        else if (idv1 == 0 && idv2 == 2) || (idv1 == 2 && idv2 == 0) then (* BAS *)
-            ((0.,-1.), (sy +. srad) -. ry)
-        else if (idv1 == 3 && idv2 == 1) || (idv1 == 1 && idv2 == 3) then (* HAUT *)
-            ((0., 1.), ry +. rh -. (sy -. srad))
-        else if (idv1 == 3 && idv2 == 2) || (idv1 == 2 && idv2 == 3) then (* DROITE *)
-            ((1., 0.), rx +. rw -. (sx -. srad))
-        else
-            raise (Failure "Wrong corner computation in sphere/rectangle wall collision.")
+            if (idv1 == 0 && idv2 == 1) || (idv1 == 1 && idv2 == 0) then (* GAUCHE *)
+                ((-1.,0.), (sx +. srad) -. rx)
+            else if (idv1 == 0 && idv2 == 2) || (idv1 == 2 && idv2 == 0) then (* BAS *)
+                ((0.,-1.), (sy +. srad) -. ry)
+            else if (idv1 == 3 && idv2 == 1) || (idv1 == 1 && idv2 == 3) then (* HAUT *)
+                ((0., 1.), ry +. rh -. (sy -. srad))
+            else if (idv1 == 3 && idv2 == 2) || (idv1 == 2 && idv2 == 3) then (* DROITE *)
+                ((1., 0.), rx +. rw -. (sx -. srad))
+            else
+                raise (Failure "Wrong corner computation in sphere/rectangle wall collision.")
         in
         let (nvel, nspos) = (reflect norm vel, spos +.. (dist **. norm)) in
         ((nspos, srad), solid_bounce_coef **. nvel)

@@ -26,10 +26,10 @@ let sep_players context =
 	) ([], []) context
 
 (* Puts players back into the context. *)
-let rec fus_players pl cx =
-	match pl with
-	| p::tl -> fus_players tl (Player(p)::cx)
-	| [] -> cx
+let fus_players pl cx =
+	fold_left (fun cx p ->
+	Player(p)::cx
+	) cx pl
 
 (* Iterates players, updates context etc... *)
 let iterate_game context =
@@ -40,17 +40,17 @@ let iterate_game context =
 		| []	-> fus_players apl acx
 	in ig pl ([], cx)
 
-let rec print_context ctx =
+let print_context ctx =
 	fold_left(fun _ v ->
 		match v with
-		| Player(_)			-> print_string "Player\n"
-		| Goal(_)			-> print_string "Goal\n"
-		| GravField(_)		-> print_string "GravField\n"
-		| Star(_)			-> print_string "Star\n"
-		| Bubble(_)			-> print_string "Bubble\n"
-		| Attractor(_)		-> print_string "Attractor\n"
-		| Wall(_)			-> print_string "Wall\n"
-		| Monster(_)		-> print_string "Monster\n"
+		| Player(_)		-> print_string "Player\n"
+		| Goal(_)		-> print_string "Goal\n"
+		| GravField(_)	-> print_string "GravField\n"
+		| Star(_)		-> print_string "Star\n"
+		| Bubble(_)		-> print_string "Bubble\n"
+		| Attractor(_)	-> print_string "Attractor\n"
+		| Wall(_)		-> print_string "Wall\n"
+		| Monster(_)	-> print_string "Monster\n"
 	) () ctx
 
 let rec game_loop context it =
