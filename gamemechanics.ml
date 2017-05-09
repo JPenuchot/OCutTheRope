@@ -14,8 +14,7 @@ let iterate_player (sph, vel, modif) context =
 	let (pos, len) = sph in
 	let npos = apply_der pos nvel dt in
 	let (np, nc) = handle_env_collision ((npos, len), nvel, modif) context in
-	let nnp = handle_rope_collision np in
-	(nnp, nc)
+	(np, nc)
 
 (* Splits players and context into two different lists. *)
 let sep_players context =
@@ -56,7 +55,7 @@ let rec print_context ctx =
 let rec game_loop context it =
 	match context with
 	| [] -> ()
-	| _ -> if (it mod 1000 == 0)	then (draw_level context true)
+	| _ -> if (it mod 10000 == 0)	then (draw_level context true)
 								else ()
 		;let nc = (iterate_game context) in game_loop nc (it + 1)
 

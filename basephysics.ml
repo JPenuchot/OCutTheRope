@@ -198,5 +198,12 @@ let ss_collide sa sb vel dt =
     else
         (sa, vel)
 
-let rope_collide rope pos vel =
-    ()
+(* Handles rope collisions then returns acceleration. *)
+let handle_rope_collision pos rope =    (* TODO *)
+    let (ropos, rlen, rstr) = rope in
+    let dist = len_of_vec (pos -.. ropos) in
+    if dist > rlen then
+        let norm = (normalize (ropos -.. pos)) in
+        (rstr *. ((rlen -. dist) ** 2.)) **. norm
+    else
+        (0.,0.)

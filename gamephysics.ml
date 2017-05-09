@@ -29,6 +29,7 @@ let acc_of_player_mod ((pos, _), _, modifs) =
 	let rec aopm mods acc =
 		match mods with
 		| Bubbled(a)::tl	-> aopm tl (a +.. acc)
+		| Roped(r)::tl		-> aopm tl ((handle_rope_collision pos r) +.. acc)
 		| _::tl				-> aopm tl acc
 		| []				-> acc
 	in aopm modifs (0., 0.)
@@ -54,12 +55,3 @@ let handle_env_collision player context =
 		| v::tl -> hec (player, (v::nc)) tl
 		| []	-> (player, nc)
 	in hec (player, []) context
-
-(* Handles rope collisions then returns a new player. *)
-let handle_rope_collision player = player	(* TODO *)
-	(*let ((pos, _), velo, modifs) = player in
-	let rec hrc pos vel md =*)
-
-(* Computes new player *)
-let iterate_player player =
-	() (* TODO *)
