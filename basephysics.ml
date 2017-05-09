@@ -84,8 +84,11 @@ let check_col_corner_sr sp re =
 
 (* Checks for collision between a sphere and the face of a rectangle. *)
 let check_col_wall_sr ((sx, sy), srad) ((rx, ry), (rw, rh)) =
-    false
-    (*(sx < rx + rw && )*)
+    (* Centre entre les bornes du rectangle && Distance centre-mur < rayon *)
+    ((sx > rx && sx < rx +. rw) && ((abs_float (sy -. ry) < srad)) || (abs_float (sy -. (ry +. rh)) < srad))
+        ||
+    ((sy > ry && sy < ry +. rh) && ((abs_float (sx -. rx) < srad)) || (abs_float (sx -. (rx +. rw)) < srad))
+    (* Centre entre les bornes du rectangle && Distance centre-mur < rayon *)
 
 (* Checks for collision between two spheres. *)
 let check_col_ss spa spb =
