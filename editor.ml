@@ -137,7 +137,7 @@ let checkNewObject level =
 		let newObject = Player(((560.,645.),25.),(0.,0.),[]) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-645)
 	else if (playerIn && (sqrt((560.-.(float_of_int pX))**2. +. (645.-.(float_of_int pY))**2.) <= 5.)) then
-		let newRope = Roped(((560.,645.),0.,0.)) in
+		let newRope = Roped(((560.,645.),0.,1.)) in
 		let levelPlayer = getPlayer level in
 		let newPlayer = addRope newRope levelPlayer in
 		let newLevel = (removeFromLevel levelPlayer level)@[newPlayer] in
