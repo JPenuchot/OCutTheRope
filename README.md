@@ -29,12 +29,22 @@ _Note that you must run `sprites/convert.sh` to generate the PPM files from PNG 
 ## To Do list
 
 Things to do (including ideas)
+
 - [X] Set up projet/configuration
 - [X] Sprites converting/loading (`sprites/convert.sh` `ppm.ml`)
 - [ ] Main file (`main.ml`)
-- [ ] Physical engine (`physics.ml`)
+- [X] Physical engine (`physics.ml`)
 - [X] Rendering (`render.ml`)
 - [ ] Management of game mechanics (`gamemechanics.ml`)
 - [X] Levels management (loading/saving/data structure) (`level.ml`)
-- [ ] Unit tests (`test.ml`)
+- [ ] Unit tests (`test.ml`) -- FUCK TESTS, WE'RE USING OCAML NOT JAVA FFS
 - [X] WYSIWYG level editor and online level sharing (`editor.ml`)
+- [ ] Remove secret NASA hacking code from our code
+
+---
+
+```
+(•_•)
+( •_•)>⌐■-■
+(⌐■_■)
+```
