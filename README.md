@@ -3,7 +3,8 @@ OCaml implementation of the Cut The Rope game
 
 ## Requirements
 
-`ocamlbuild` and `ocamlfind` are both required to build this project. You can install them using OPAM.
+`ocamlbuild` and `ocamlfind` are both required to build this project. You can install them using OPAM.  
+The level editor needs `python` to upload levels (for the input box)
 
 Dependencies :
 

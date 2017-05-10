@@ -8,6 +8,7 @@ open Graphics
 open Render
 open Level
 open Gametypes
+open Http
 
 (* Load a file if there is one given as a parameter *)
 let level =
@@ -26,6 +27,8 @@ let rec containsPlayer level =
 
 (* Function to draw each game object in the right menu *)
 let draw_menu drawPlayer =
+	moveto 520 680;
+	draw_string "Upload level";
 	if drawPlayer then
 		draw_image player_sprite 535 620
 	else
@@ -149,7 +152,7 @@ let checkNewObject level =
 		let newObject = Attractor((560.,405.),0.) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-405)
 	else if (pointIsInObject pX pY (Bubble(((560.,565.),25.),(0.,0.)))) then
-		let newObject = Bubble(((560.,565.),25.),(0.,0.)) in
+		let newObject = Bubble(((560.,565.),25.),(0.,1.15)) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-565)
 	else if (pointIsInObject pX pY (Goal(((522.,170.),(75.,100.))))) then
 		let newObject = Goal(((522.,170.),(75.,100.))) in
@@ -181,6 +184,21 @@ let rec removeOutObjects level =
 	)
 	| [] -> level
 
+(* Call an input box written in python ('inputbox.box') and return the result *)
+let inputBox title =
+	let ib = Unix.open_process_in ("python inputbox.py \"" ^ title ^ "\"") in
+	let getStdOut =
+		try
+			input_line ib
+		with _ -> ""
+	in
+	ignore (Unix.close_process_in ib);
+	getStdOut
+
+(* Upload a level to the server *)
+let uploadLevel title level =
+	httpGET ()
+
 (* Main function, will be called reccursivly *)
 let rec main level =
 	try
@@ -203,6 +221,13 @@ let rec main level =
 		(* Bind the escape key to leave the editor *)
 		if ((Char.code event.key) = 27) then
 			raise (Graphic_failure("Game closed with escape."));
+
+		(* Check for upload *)
+		if ((event.mouse_x >= 520) && (event.mouse_y >= 680)) then begin
+			let title = inputBox "Enter the name of your level:" in
+			if (title <> "") then
+				uploadLevel title level;
+		end;
 
 		(* This will be a pair, the first value is a boolean that indicates if an object is pointed *)
 		let pointed = getPointedObject (fst (mouse_pos())) (snd (mouse_pos())) level in

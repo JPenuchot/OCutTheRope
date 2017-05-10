@@ -4,26 +4,8 @@
  *	Download a collection of levels from an online server.
  *)
 
-open Lwt
-open Cohttp
-open Cohttp_lwt_unix
 open Graphics
-
-exception HTTPError
-
-(* string -> (int * string)
- * Return the HTTP code and the response content of a GET request *)
-let httpGET url =
-	let get =
-		Client.get (Uri.of_string url) >>= fun (resp, body) ->
-	 	let code = resp |> Response.status |> Code.code_of_status in
-	 	(*Printf.printf "Response code: %d\n" code;
-	 	Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);*)
-	 	body |> Cohttp_lwt_body.to_string >|= fun body ->
-	 	(*Printf.printf "Body of length: %d\n" (String.length body);*)
- 		(code, body)
- 	in
- 	Lwt_main.run get
+open Http
 
 (* unit -> (string * string) list 
  * Return a list of string couple, (level id, level description) *)
@@ -51,6 +33,11 @@ let rec printStringCoupleList l =
 let rec ocaMain levels i =
 	(* Draw a button *)
 	let drawButton x y width height text =
+		set_color (rgb 127 127 127);
+		fill_rect (x+5) (y-5) width height;
+		set_color (rgb 200 200 200);
+		fill_rect x y width height;
+		set_color black;
 		draw_rect x y width height;
 		let textSize = text_size text in
 		moveto (x + (width-(fst textSize))/2) (y + (height-(snd textSize))/2);
@@ -87,17 +74,24 @@ let rec ocaMain levels i =
 	drawList levels i;
 
 	(* Draw up and down buttons *)
-	drawButton 10 10 50 30 "Up";
-	drawButton (500-60) 10 50 30 "Down";
+	drawButton 10 10 50 30 "Down";
+	drawButton (500-60) 10 50 30 "Up";
 
 	(* Wait for a mouse click *)
 	let event = wait_next_event [Button_down] in
 
 	(* Check for a click on a level *)
-	Printf.printf "Pressed: %s\n%!" (getPressed levels i event.mouse_x event.mouse_y);
-
-
-	ocaMain levels i
+	let pressed = getPressed levels i event.mouse_x event.mouse_y in
+	if pressed <> "" then
+	 	Printf.printf "%s\n%!" pressed
+	else begin
+	 	if ((event.mouse_x >= 10) && (event.mouse_x <= 60) && (event.mouse_y >= 10) && (event.mouse_y <= 40)) then
+	 		ocaMain levels (min ((List.length levels)-1) (i+1))
+	 	else if ((event.mouse_x >= 460) && (event.mouse_x <= 490) && (event.mouse_y >= 10) && (event.mouse_y <= 40)) then
+	 		ocaMain levels (max 0 (i-1))
+	 	else
+	 		ocaMain levels i;
+	end
 
 (* Run some usefull stuff *)
 let () =
@@ -113,7 +107,11 @@ let () =
 	);
 	moveto 30 300;
 	draw_string "Downloading levels, please wait....";
-	set_font "-*-fixed-medium-r-semicondensed--15-*-*-*-*-*-iso8859-1";
+	ignore (
+		try
+			set_font "-*-fixed-medium-r-semicondensed--15-*-*-*-*-*-iso8859-1"
+		with Graphics.Graphic_failure(_) -> ()
+	);
 
 	(* Download the levels and execute the main function *)
 	try
