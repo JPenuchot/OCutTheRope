@@ -6,6 +6,7 @@
  *)
 
 open Basephysics
+open List
 
 (* Describes a moifier on a player *)
 type modifier =
@@ -36,3 +37,19 @@ type kindEnd =
 	| Win
 	| Die
 exception EndGame of kindEnd
+
+(* HELPER FUNCTIONS *)
+
+(* Splits players and context into two different lists. *)
+let sep_players context =
+	fold_left (fun (pl, cn) cx ->
+		match cx with
+		| Player(p)	-> (p::pl, cn)
+		| a			-> (pl, a::cn)
+	) ([], []) context
+
+(* Puts players back into the context. *)
+let fus_players pl cx =
+	fold_left (fun cx p ->
+	Player(p)::cx
+	) cx pl
