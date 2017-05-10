@@ -8,6 +8,10 @@ open Str
 open String
 open Gametypes
 
+let default_grav = (0., -1)
+let default_rope_str = 10.
+let default_attract = 10.
+
 (* The regular expression to match the object in a line *)
 let regExpFloat =
 	"\\(\\-?[0-9]+\\.[0-9]*\\)"

@@ -16,9 +16,12 @@ let num_sims = 1000
 
 (* Sends a new iteration of a player. *)
 let iterate_player (sph, vel, modif) context =
+	(* Applying speed to the pos *)
 	let nvel = vel_of_player (sph, vel, modif) context in
 	let (pos, len) = sph in
 	let npos = apply_der pos nvel dt in
+
+	(* Handling collisions *)
 	let (np, nc) = handle_env_collision ((npos, len), nvel, modif) context in
 	(np, nc)
 
@@ -32,6 +35,7 @@ let iterate_game context =
 	in let nc = ig pl ([], cx) in
 	handle_mouse_col nc
 
+(* Prints a context, mostly for debug... *)
 let print_context ctx =
 	fold_left(fun _ v ->
 		match v with

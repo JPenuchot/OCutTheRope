@@ -2,4 +2,12 @@ open Level
 open Basephysics
 open Gamemechanics
 
-let () = game_loop (loadLevel "levels/1.lvl")
+(* Load a file if there is one given as a parameter *)
+let level =
+	(*Printf.printf "Loading level\n%!";*)
+	if (Array.length Sys.argv) >= 2 then
+		loadLevel Sys.argv.(1)
+	else
+		failwith "You must specify a level file!"
+
+let () = game_loop level
