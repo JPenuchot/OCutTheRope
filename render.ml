@@ -12,10 +12,13 @@ open Gametypes
 let () = 
     (* Open a graphic window with the size depending on the running programm
      * "contains" is from level.ml *)
-    if (contains Sys.executable_name "editor") then
-        open_graph " 620x700"
-    else
+    if (contains Sys.executable_name "editor") then begin
+        open_graph " 620x700";
+        set_window_title "OCutTheRope - Level Editor"
+    end else begin
         open_graph " 500x700";
+        set_window_title "OCutTheRope"
+    end;
     (* Enable double buffering, use "synchronize()" to update window *)
     auto_synchronize false
 

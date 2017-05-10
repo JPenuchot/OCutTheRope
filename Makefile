@@ -9,18 +9,22 @@ clean:
 native:
 			$(OCB) game.native
 			$(OCB) editor.native
+			$(OCB) download.native
 
 byte:
 			$(OCB) game.byte
 			$(OCB) editor.byte
+			$(OCB) download.byte
 
 profile:
 			$(OCB) -tag profile game.native
 			$(OCB) -tag profile editor.native
+			$(OCB) -tag profile download.native
 
 debug:
 			$(OCB) -tag debug game.byte
 			$(OCB) -tag debug editor.byte
+			$(OCB) -tag debug download.byte
 
 test: 		
 	$(OCB) -tag debug test.byte
