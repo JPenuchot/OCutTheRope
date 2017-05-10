@@ -12,10 +12,13 @@ open Gametypes
 let () = 
     (* Open a graphic window with the size depending on the running programm
      * "contains" is from level.ml *)
-    if (contains Sys.executable_name "editor") then
-        open_graph " 620x700"
-    else
+    if (contains Sys.executable_name "editor") then begin
+        open_graph " 620x700";
+        set_window_title "OCutTheRope - Level Editor"
+    end else begin
         open_graph " 500x700";
+        set_window_title "OCutTheRope"
+    end;
     (* Enable double buffering, use "synchronize()" to update window *)
     auto_synchronize false
 
@@ -52,14 +55,14 @@ type typePlayerInfos = {
 let rec drawRope (x1, y1) (x2, y2) l inv =
     (* Check for a too long rope *)
     let tooLong = (sqrt((x2-.x1)**2. +. (y2-.y1)**2.)) > l in
+    let ix1 = int_of_float x1 in
+    let ix2 = int_of_float x2 in
+    let iy1 = int_of_float y1 in
+    let iy2 = int_of_float y2 in
+    let il = int_of_float l in
     (* Check for a verticle rope *)
-    if ((x1 = x2) || tooLong) then begin
+    if ((ix1 = ix2) || tooLong) then begin
         if tooLong then set_color 0xFF0000;
-        let ix1 = int_of_float x1 in
-        let ix2 = int_of_float x2 in
-        let iy1 = int_of_float y1 in
-        let iy2 = int_of_float y2 in
-        let il = int_of_float l in
         if inv then
             fill_circle ix1 iy1 5
         else
@@ -74,7 +77,7 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
         if tooLong then set_color 0x000000;
     end
     (* Rearange the points *)
-    else if (x2 < x1) then
+    else if (ix2 < ix1) then
         drawRope (x2,y2) (x1,y1) l (not inv)
     else begin
         (* Compute z *)

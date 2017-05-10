@@ -26,7 +26,7 @@ if (isset($_GET['getlist'])) {
 	 	if (substr($level, -4) == ".lvl") {
 	 		$id = substr($level, 0, -4);
 	 		echo "$id\n";
-	 		echo file_get_contents("levels/".$id.".desc")."\n\n";
+	 		echo file_get_contents("levels/".$id.".desc")."\n";
 	 	}
 	 }
 
