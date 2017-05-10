@@ -12,9 +12,21 @@ open Catenary
 (* Checks for a collision between a rope and the mouse cursor. *)
 let rope_mouse_col (opX, opY) (npX, npY) (playerX, playerY) ((ropeX, ropeY), ropeLength, _) =
 	if (opX <> npX || opY <> npY) then begin
+		(* The equation of the catenary *)
 		let cat = getCatenaryFunction playerX playerY ropeX ropeY ropeLength in
-
-		(* TODO: Check intersection between cat(x) and (opX, opY)->(npX, npY) *)
+		(* The equation of the cutting line *)
+		let cut =
+			let slope = ((float_of_int npY) -. (float_of_int opY)) /. ((float_of_int npX) -. (float_of_int opX)) in
+			Printf.printf "%f\n%!" slope;
+			(fun x -> slope *. x +. (float_of_int opY))
+		in
+		(* TODO: Check intersection between cat(x) and cut(x) *)
+		let rec check fromX toX =
+			if (fromX = toX) then false
+			else begin
+				false
+			end
+		in
 
 		Printf.printf "(%d, %d) -> (%d, %d)\n%!" opX opY npX npY;
 		false
