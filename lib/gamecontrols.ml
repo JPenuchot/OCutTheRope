@@ -10,7 +10,8 @@ open List
 
 (* Checks for a collision between a rope and the mouse cursor. *)
 let rope_mouse_col mpos ppos rope =
-	false
+	let (rpos,_,_) = rope in
+	(len_of_vec_sq (rpos -.. mpos)) < 400.
 
 (* Checks for mouse collision with a player's modifiers and/or rope(s)
  * then outputs a new player *)
