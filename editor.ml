@@ -67,7 +67,7 @@ let rec dragObject o level rX rY =
 		(* Create the new moved object (only on a mutiple of 5) *)
 		let newObject = updatePosition o (float_of_int ((event.mouse_x-rX)/5*5)) (float_of_int ((event.mouse_y-rY)/5*5)) in
 		(* Redraw the level *)
-		draw_level level false;
+		draw_level_editor level false;
 		draw_menu (not (containsPlayer level));
 		synchronize ();
 		(* Reccursive call with the context where the old object is replaced with the new one *)
@@ -124,7 +124,7 @@ let rec dragRope r level p =
 		(* Create a player with the updated rope *)
 		let newPlayer = replaceRope r newRope p in
 		(* Redraw the level *)
-		draw_level level false;
+		draw_level_editor level false;
 		draw_menu (not (containsPlayer level));
 		synchronize ();
 		(* Reccursive call with the context where the old player is replaced with the new one *)
@@ -209,7 +209,7 @@ let rec main level =
 		in
 
 		(* Draw the level without displaying it *)
-		draw_level level false;
+		draw_level_editor level false;
 		
 		(* Draw the games objects in the right menu *)
 		draw_menu (not (containsPlayer level));
