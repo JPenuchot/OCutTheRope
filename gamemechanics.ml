@@ -49,7 +49,7 @@ let game_loop context =
 	let nt = create (fun () -> delay (1. /. 60.)) () in
 	
 	let rec gloop context it t =
-		if (it mod 10000 == 0) then	(* Creating a thread that will sleep during 1/60 sec *)
+		if (it mod num_sims == 0) then	(* Creating a thread that will sleep during 1/60 sec *)
 		(
 			join t;
 			draw_level context true;

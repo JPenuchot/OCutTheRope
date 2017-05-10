@@ -8,7 +8,7 @@ open Basephysics
 open Gametypes
 open List
 
-let dt = 0.0001
+let dt = 0.001
 let friction_coef = 0.01
 
 (* Attraction vector formula *)
