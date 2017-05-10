@@ -49,28 +49,52 @@ let rec printStringCoupleList l =
 
 (* Main function *)
 let rec ocaMain levels i =
+	(* Draw a button *)
 	let drawButton x y width height text =
 		draw_rect x y width height;
 		let textSize = text_size text in
 		moveto (x + (width-(fst textSize))/2) (y + (height-(snd textSize))/2);
 		draw_string text
 	in
+	(* Draw a button list *)
 	let rec drawList l from =
 		match l with
 		| e::q ->
 			if (from > 0) then
 				drawList q (from-1)
 			else begin
-				drawButton 30 (570 + (60*from)) 400 30 (snd e);
+				drawButton 30 (540 + (60*from)) 440 30 (snd e);
 				drawList q (from-1)
 			end
 		| []   -> ()
+	in
+	(* Check if a button is pressed *)
+	let rec getPressed l from x y =
+		match l with
+		| e::q ->
+			if (from > 0) then
+				getPressed q (from-1) x y
+			else begin
+				if (x >= 30) && (y >= (540 + (60*from))) && (x <= 30+440) && (y <= (540 + (60*from))+30) then
+					fst e
+				else
+					getPressed q (from-1) x y;
+			end
+		| []   -> ""
 	in
 	(* Draw the list from i position *)
 	clear_graph ();
 	drawList levels i;
 
-	let event = wait_next_event [Key_pressed] in
+	(* Draw up and down buttons *)
+	drawButton 10 10 50 30 "Up";
+	drawButton (500-60) 10 50 30 "Down";
+
+	(* Wait for a mouse click *)
+	let event = wait_next_event [Button_down] in
+
+	(* Check for a click on a level *)
+	Printf.printf "Pressed: %s\n%!" (getPressed levels i event.mouse_x event.mouse_y);
 
 
 	ocaMain levels i
@@ -89,14 +113,9 @@ let () =
 	);
 	moveto 30 300;
 	draw_string "Downloading levels, please wait....";
+	set_font "-*-fixed-medium-r-semicondensed--15-*-*-*-*-*-iso8859-1";
 
 	(* Download the levels and execute the main function *)
 	try
 		ocaMain (getOnlineList ()) 0
 	with Graphics.Graphic_failure(_) -> exit 0
-
-
-
-
-
-
