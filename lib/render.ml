@@ -96,7 +96,10 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
         let q = (y2+.y1-.l*.(cosh z)/.(sinh z)) /. 2. in
         (* A function to draw a curve from a given function *)
         let rec drawCurve fromX toX step func =
-            lineto (int_of_float fromX) (int_of_float (func fromX));
+            if (fromX >= toX) then
+                lineto ix2 iy2 (* Prevent that the curve go further than the point *)
+            else
+                lineto (int_of_float fromX) (int_of_float (func fromX));
             if (fromX < toX) then
                 drawCurve (fromX +. step) toX step func
             else
