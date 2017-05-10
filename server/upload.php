@@ -18,7 +18,7 @@ function error($message) {
 }
 
 // Check the parameters
-if (!isset($_GET['level']) || !isset($_GET['level'])) {
+if (!isset($_GET['level']) || !isset($_GET['description'])) {
 	error("You must specify the GET parameters \"level\" and \"description\"!");
 }
 
@@ -29,11 +29,11 @@ if ($_GET['level'] === "" || $_GET['description'] === "") {
 
 // Check the level file
 if (strpos($_GET['level'], "# OCutTheRope Level File 1.0") !== 0) {
-	error("Incorrect level file!")
+	error("Incorrect level file!");
 }
 
 // Saves the level
-$md5 = md5($_GET['level']);
+$md5 = md5($_GET['level'].$_GET['description']);
 file_put_contents("levels/$md5.lvl", $_GET['level']);
 file_put_contents("levels/$md5.desc", $_GET['description']);
 

@@ -1,6 +1,6 @@
 (*	HTTP.ML
  *	
- *	Contains simple functions to send HTTP GET requests
+ *	Contains simple functions to send HTTP GET requests.
  *)
 
 open Lwt
@@ -23,21 +23,29 @@ let httpGET url =
  	in
  	Lwt_main.run get
 
+(* From https://caml.inria.fr/pub/old_caml_site/Examples/oc/basics/explode.ml *)
+let explode s =
+	let rec expl i l =
+		if i < 0 then l else
+		expl (i - 1) (s.[i] :: l) in
+ 	expl (String.length s - 1) []
 
+(* From https://github.com/samoht/ocaml-wget/blob/master/src/http.ml#L54 *)
 let urlencode param =
-	let chars = String.explode param in
+	let chars = explode param in
 	let rec fn = function
 		| x::tl ->
 		begin
 			let s =
 				if x = ' ' then "+"
 				else match x with
+				| '\n' -> "%0A"
 				| 'A'..'Z'
 				| 'a'..'z'
 				| '0'..'9'
 				| '$' | '-' | '_' | '.' | '!'
 				| '*' | '\'' | '(' | ')' | ',' ->
-					String.of_char x
+					String.make 1 x
 				| _ ->
 					Printf.sprintf "%%%2x" (Char.code x)
 			in

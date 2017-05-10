@@ -9,6 +9,7 @@ open Render
 open Level
 open Gametypes
 open Http
+open Scripts
 
 (* Load a file if there is one given as a parameter *)
 let level =
@@ -184,20 +185,13 @@ let rec removeOutObjects level =
 	)
 	| [] -> level
 
-(* Call an input box written in python ('inputbox.box') and return the result *)
-let inputBox title =
-	let ib = Unix.open_process_in ("python inputbox.py \"" ^ title ^ "\"") in
-	let getStdOut =
-		try
-			input_line ib
-		with _ -> ""
-	in
-	ignore (Unix.close_process_in ib);
-	getStdOut
-
 (* Upload a level to the server *)
 let uploadLevel title level =
-	httpGET ()
+	let resp = httpGET ("http://octr.walter.tw/upload.php?level=" ^ (urlencode (level2String level)) ^ "&description=" ^ (urlencode title)) in
+	if ((fst resp) <> 200) then
+		messageBox "Upload level" "An error occured!\nYour level has not been uploaded."
+	else
+		messageBox "Upload level" "Your level has been uploaded!"
 
 (* Main function, will be called reccursivly *)
 let rec main level =

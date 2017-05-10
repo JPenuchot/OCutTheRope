@@ -296,5 +296,5 @@ let level2String level =
 (* Save a level to a file *)
 let saveLevel level file =
 	let channel = open_out file in
-		output_string channel (level2String level);
-		close_out channel
+	output_string channel (level2String level);
+	close_out channel

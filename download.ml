@@ -6,6 +6,7 @@
 
 open Graphics
 open Http
+open Scripts
 
 (* unit -> (string * string) list 
  * Return a list of string couple, (level id, level description) *)
@@ -63,11 +64,11 @@ let rec ocaMain levels i =
 				getPressed q (from-1) x y
 			else begin
 				if (x >= 30) && (y >= (540 + (60*from))) && (x <= 30+440) && (y <= (540 + (60*from))+30) then
-					fst e
+					e
 				else
 					getPressed q (from-1) x y;
 			end
-		| []   -> ""
+		| []   -> ("", "")
 	in
 	(* Draw the list from i position *)
 	clear_graph ();
@@ -82,12 +83,26 @@ let rec ocaMain levels i =
 
 	(* Check for a click on a level *)
 	let pressed = getPressed levels i event.mouse_x event.mouse_y in
-	if pressed <> "" then
-	 	Printf.printf "%s\n%!" pressed
-	else begin
+	if ((fst pressed) <> "") then begin
+	 	(* Download the level *)
+	 	let resp = httpGET ("http://octr.walter.tw/get.php?getlevel=" ^ (fst pressed)) in
+	 	if ((fst resp) <> 200) then
+	 		messageBox "Level downloading" "An error occured!\nYour level has not been downloaded."
+	 	else begin
+		 	(* Save it *)
+		 	let channel = open_out ("levels/online/" ^ (snd pressed) ^ ".lvl") in
+			output_string channel (snd resp);
+			close_out channel;
+			(* Run it *)
+			ignore (Sys.command ("./game.native \"levels/online/" ^ (snd pressed) ^ ".lvl\""));
+			(* Exit *)
+			exit 0
+		end
+
+	end else begin
 	 	if ((event.mouse_x >= 10) && (event.mouse_x <= 60) && (event.mouse_y >= 10) && (event.mouse_y <= 40)) then
 	 		ocaMain levels (min ((List.length levels)-1) (i+1))
-	 	else if ((event.mouse_x >= 460) && (event.mouse_x <= 490) && (event.mouse_y >= 10) && (event.mouse_y <= 40)) then
+	 	else if ((event.mouse_x >= 440) && (event.mouse_x <= 490) && (event.mouse_y >= 10) && (event.mouse_y <= 40)) then
 	 		ocaMain levels (max 0 (i-1))
 	 	else
 	 		ocaMain levels i;
