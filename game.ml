@@ -10,4 +10,7 @@ let level =
 	else
 		failwith "You must specify a level file!"
 
-let () = game_loop level
+let () = 
+	try
+		game_loop level
+	with Graphics.Graphic_failure(_) -> exit 0

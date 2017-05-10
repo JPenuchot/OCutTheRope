@@ -9,6 +9,7 @@ open Ppm
 open Level
 open Gametypes
 open List
+open Catenary
 
 let () = 
     (* Open a graphic window with the size depending on the running programm
@@ -82,18 +83,6 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
     else if (ix2 < ix1) then
         drawRope (x2,y2) (x1,y1) l (not inv)
     else begin
-        (* Compute z *)
-        let rec computeZ z =
-            if (((sinh z) /. z) < ((sqrt (l**2. -. (y2-.y1)**2.)) /. (x2-.x1))) then
-                computeZ (z +. 0.001)
-            else
-                z
-        in
-        let z = computeZ 0.001 in
-        (* Calculate the curve parameters *)
-        let a = (x2 -. x1) /. 2. /. z in
-        let p = (x1+.x2-.a*.(log ( (l+.y2-.y1) /. (l-.y2+.y1) ))) /. 2. in
-        let q = (y2+.y1-.l*.(cosh z)/.(sinh z)) /. 2. in
         (* A function to draw a curve from a given function *)
         let rec drawCurve fromX toX step func =
             if (fromX >= toX) then
@@ -105,17 +94,13 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
             else
                 ()
         in
-        (* The function *)
-        let f x =
-            a *. (cosh ((x-.p)/.a)) +. q
-        in
         (* Draw the curve that corresponds to the rope *)
         if inv then
             fill_circle (int_of_float x1) (int_of_float y1) 5
         else
             fill_circle (int_of_float x2) (int_of_float y2) 5;
         moveto (int_of_float x1) (int_of_float y1);
-        drawCurve x1 x2 1. f
+        drawCurve x1 x2 1. (getCatenaryFunction x1 y1 x2 y2 l)
     end
 
 (* Draw the modifiers of a player *)

@@ -11,6 +11,7 @@ open Render
 open Thread
 open List
 open Gametypes
+open Graphics
 
 let num_sims = 200
 
@@ -26,14 +27,14 @@ let iterate_player (sph, vel, modif) context =
 	(np, nc)
 
 (* Iterates players, updates context etc... *)
-let iterate_game context =
+let iterate_game context x y =
 	let (pl, cx) = sep_players context in
 	let rec ig pl (apl, acx) =
 		match pl with
 		| p::tl	-> let (np, ncx) = iterate_player p acx in ig tl (np::apl, ncx)
 		| []	-> fus_players apl acx
 	in let nc = ig pl ([], cx) in
-	handle_mouse_col nc
+	handle_mouse_col nc x y
 
 (* Prints a context, mostly for debug... *)
 let print_context ctx =
@@ -53,16 +54,17 @@ let print_context ctx =
 let game_loop context =
 	let nt = create (fun () -> delay (1. /. 60.)) () in
 	
-	let rec gloop context it t =
+	let rec gloop context it t x y = (* x and y are the last mouse positions *)
+		let (nX, nY) = mouse_pos () in
 		if (it mod num_sims == 0) then	(* Creating a thread that will sleep during 1/60 sec *)
 		(
 			join t;
 			draw_level_game context true;
 			let newth = create (fun () -> delay (1. /. 60.)) () in
-			let nc = (iterate_game context) in
-			gloop nc (it + 1) newth
+			let nc = (iterate_game context x y) in
+			gloop nc (it + 1) newth nX nY
 		)
 		else
-			let nc = (iterate_game context) in
-			gloop nc (it + 1) t
-	in gloop context 1 nt
+			let nc = (iterate_game context x y) in
+			gloop nc (it + 1) t nX nY
+	in gloop context 1 nt 0 0
