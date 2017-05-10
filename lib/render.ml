@@ -112,7 +112,7 @@ let separate_modifiers m =
         | Bubbled(_)    ->  (bl, elm::rl)
         | _ -> (bl, rl)
     ) ([], []) m in
-    [rl; bl]
+    [bl; rl]
 
 (* Draw the modifiers of a player *)
 let rec draw_mods p m =
