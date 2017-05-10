@@ -8,6 +8,7 @@ open Graphics
 open Ppm
 open Level
 open Gametypes
+open List
 
 let () = 
     (* Open a graphic window with the size depending on the running programm
@@ -145,21 +146,47 @@ let draw_single_element element =
     | Monster((posX, posY), _)             -> draw_image monster_sprite   (int_of_float posX) (int_of_float posY)
     | _                                    -> ()
 
+(* Separate elements into different lists for rendering priority. *)
+let separate_elements lst =
+    let (a1,a2,a3,a4,a5,a6,a7,a8) = fold_left (fun (l1, l2, l3, l4, l5, l6, l7, l8) elmt ->
+        match elmt with
+        | Player(_)     -> (elmt::l1, l2, l3, l4, l5, l6, l7, l8)
+        | Goal(_)       -> (l1, elmt::l2, l3, l4, l5, l6, l7, l8)
+        | GravField(_)  -> (l1, l2, elmt::l3, l4, l5, l6, l7, l8)
+        | Star(_)       -> (l1, l2, l3, elmt::l4, l5, l6, l7, l8)
+        | Bubble(_)     -> (l1, l2, l3, l4, elmt::l5, l6, l7, l8)
+        | Attractor(_)  -> (l1, l2, l3, l4, l5, elmt::l6, l7, l8)
+        | Wall(_)       -> (l1, l2, l3, l4, l5, l6, elmt::l7, l8)
+        | Monster(_)    -> (l1, l2, l3, l4, l5, l6, l7, elmt::l8)
+    ) ([],[],[],[],[],[],[],[]) lst in [a8;a7;a6;a5;a4;a3;a2;a1]
+
+
 (* Just call this function to draw the level
  * @params
  *   level of context : the level
  *   sync  of bool    : true to synchronize, false to don't
  *)
-let draw_level level sync =
+let draw_level_game level sync =
     (* Clear old drawing *)
     clear_graph();
     (* Draw background *)
     draw_image background 0 0;
     (* Internal function to draw the elements of a gameElement list *)
-    let rec draw_elements elementsList =
-        match elementsList with
-        | [] -> ()
-        | t::q -> draw_single_element t; draw_elements q;
-    in
-    draw_elements level;
+    fold_left (fun _ lst ->
+        fold_left(fun _ elmt ->
+            draw_single_element elmt
+        ) () lst
+    ) () (separate_elements level);
+    if sync then synchronize()
+
+
+let draw_level_editor level sync =
+    (* Clear old drawing *)
+    clear_graph();
+    (* Draw background *)
+    draw_image background 0 0;
+    (* Internal function to draw the elements of a gameElement list *)
+    fold_left (fun _ elmt ->
+        draw_single_element elmt
+    ) () level;
     if sync then synchronize()

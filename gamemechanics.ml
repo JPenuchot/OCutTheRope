@@ -4,13 +4,13 @@
  *	Game physics functions are called here to iterate through the game.
  *)
 
-open Gametypes
 open Gamephysics
 open Gamecontrols
 open Basephysics
 open Render
 open Thread
 open List
+open Gametypes
 
 let num_sims = 1000
 
@@ -29,7 +29,8 @@ let iterate_game context =
 		match pl with
 		| p::tl	-> let (np, ncx) = iterate_player p acx in ig tl (np::apl, ncx)
 		| []	-> fus_players apl acx
-	in ig pl ([], cx)
+	in let nc = ig pl ([], cx) in
+	handle_mouse_col nc
 
 let print_context ctx =
 	fold_left(fun _ v ->
@@ -52,7 +53,7 @@ let game_loop context =
 		if (it mod num_sims == 0) then	(* Creating a thread that will sleep during 1/60 sec *)
 		(
 			join t;
-			draw_level context true;
+			draw_level_game context true;
 			let newth = create (fun () -> delay (1. /. 60.)) () in
 			let nc = (iterate_game context) in
 			gloop nc (it + 1) newth
