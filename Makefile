@@ -1,4 +1,4 @@
-OCB_FLAGS = -use-ocamlfind -pkg cohttp.lwt
+OCB_FLAGS = -use-ocamlfind -pkg cohttp.lwt -I lib
 OCB = 		ocamlbuild $(OCB_FLAGS)
 
 all: 		native # test # profile debug
