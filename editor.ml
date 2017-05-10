@@ -107,7 +107,7 @@ let removeOutRopes p =
 		List.filter (
 			fun e ->
 				match e with
-				| Roped(((x, y), _, _)) -> x >= 0. && x <= 500. && y >= 0. && y <= 700.
+				| Roped(((x, y), _, _)) -> (x >= 0. && x <= 500. && y >= 0. && y <= 700.)
 				| _                     -> true
 		) m
 	in
@@ -262,6 +262,7 @@ let rec main level =
 	(* Caught the graphics exceptions (for example window closing) *)
 	with Graphics.Graphic_failure(_) ->
 		(* Save the level (and add a gravity field) *)
+		let level = removeOutObjects level in
 		let isGravity =
 			List.exists (fun e -> match e with | GravField(_) -> true | _ -> false) level
 		in
