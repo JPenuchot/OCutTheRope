@@ -43,15 +43,16 @@ let vel_of_player player ctx =
 
 (* Handles environment collisions then returns a new player and context. *)
 let handle_env_collision player context =
-	fold_left (fun (player, nc) context ->
+	fold_left (fun (player, nc) elm ->
 		let (sph, vel, m) = player in
-		match context with
+		match elm with
 		| Star(s) when (check_col_ss sph s)										-> ((sph, vel, Point::m), nc)
 		| Bubble(s, accel) when (check_col_ss sph s)							-> ((sph, vel, (Bubbled(accel)::m)), nc)
 		| Goal(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Win))
+		| Monster(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Die))
 		| Wall(r) ->
 				let (nsph, nvel) = sr_corner_collide sph r vel in
 				let (nnsph, nnvel) = sr_wall_collide nsph r nvel in
 				((nnsph, nnvel, m), Wall(r)::nc)
-		| v -> (player, (v::nc))
+		| _ -> (player, (elm::nc))
 	) (player, []) context

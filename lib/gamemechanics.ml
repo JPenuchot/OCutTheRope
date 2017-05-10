@@ -48,6 +48,7 @@ let print_context ctx =
 		| Attractor(_)	-> print_string "Attractor\n"
 		| Wall(_)		-> print_string "Wall\n"
 		| Monster(_)	-> print_string "Monster\n"
+		| _ -> ()
 	) () ctx
 
 (* Manages timing for rendering calls etc. *)
