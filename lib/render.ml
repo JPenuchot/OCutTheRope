@@ -54,6 +54,7 @@ type typePlayerInfos = {
 (* Draw a line bewteen two pos with a specified length *)
 (* The parameter inv is used to know if the points as been inverted (set false by default) *)
 let rec drawRope (x1, y1) (x2, y2) l inv =
+    set_line_width 2;
     (* Check for a too long rope *)
     let tooLong = (sqrt((x2-.x1)**2. +. (y2-.y1)**2.)) > l in
     let ix1 = int_of_float x1 in
@@ -113,7 +114,6 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
         moveto (int_of_float x1) (int_of_float y1);
         drawCurve x1 x2 1. f
     end
-
 
 (* Draw the modifiers of a player *)
 let rec draw_modifiers p m =
