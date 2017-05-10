@@ -12,7 +12,7 @@ open Thread
 open List
 open Gametypes
 
-let num_sims = 1000
+let num_sims = 200
 
 (* Sends a new iteration of a player. *)
 let iterate_player (sph, vel, modif) context =

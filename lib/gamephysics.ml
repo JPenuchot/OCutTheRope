@@ -8,8 +8,8 @@ open Basephysics
 open Gametypes
 open List
 
-let dt = 0.001
-let friction_coef = 0.01
+let dt = 0.01
+let air_friction_coef = 0.01
 
 (* Attraction vector formula *)
 let attract obj_pos attr_pos attr_str =
@@ -27,7 +27,7 @@ let acc_of_context ((pos, _), _, _) ctx =
 
 (* Computes acceleration for a given player given its velocity, position and modifiers *)
 let acc_of_player_mod ((pos, _), vel, modifs) =
-	let friction = (-1. *. friction_coef *. (len_of_vec vel)) **. vel in
+	let friction = (-1. *. air_friction_coef *. (len_of_vec vel)) **. vel in
 	fold_left (fun acc m ->
 		match m with
 		| Bubbled(a)	-> (a +.. acc)
