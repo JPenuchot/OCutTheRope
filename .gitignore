@@ -26,6 +26,9 @@ setup.log
 # Icon must end with two \r
 Icon
 
+# Downloaded levels
+levels/online/*.lvl
+
 
 # Thumbnails
 ._*
