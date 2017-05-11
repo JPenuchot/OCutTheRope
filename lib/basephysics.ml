@@ -7,7 +7,7 @@
 
 (* Base types *)
 
-let solid_bounce_coef = 0.9
+let solid_bounce_coef = 0.8
 
 type size = float * float
 
