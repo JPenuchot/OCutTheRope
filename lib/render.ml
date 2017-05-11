@@ -163,21 +163,25 @@ let draw_single_element element =
     | Attractor((posX, posY), _)           -> draw_image attractor_sprite (int_of_float (posX-.25.)) (int_of_float (posY-.25.))
     | Wall((posX, posY), _)                -> draw_image wall_sprite      (int_of_float posX) (int_of_float posY)
     | Monster((posX, posY), _)             -> draw_image monster_sprite   (int_of_float posX) (int_of_float posY)
+    | RopeMaker(((posX, posY), radius), _) -> let iposX = int_of_float posX in let iposY = int_of_float posY in
+                                                fill_circle iposX iposY 5;
+                                                draw_circle iposX iposY (int_of_float radius)
     | _                                    -> ()
 
 (* Separate elements into different lists for rendering priority. *)
 let separate_elements lst =
-    let (a1,a2,a3,a4,a5,a6,a7,a8) = fold_left (fun (l1, l2, l3, l4, l5, l6, l7, l8) elmt ->
+    let (a1,a2,a3,a4,a5,a6,a7,a8,a9) = fold_left (fun (l1, l2, l3, l4, l5, l6, l7, l8, l9) elmt ->
         match elmt with
-        | Player(_)     -> (elmt::l1, l2, l3, l4, l5, l6, l7, l8)
-        | Goal(_)       -> (l1, elmt::l2, l3, l4, l5, l6, l7, l8)
-        | GravField(_)  -> (l1, l2, elmt::l3, l4, l5, l6, l7, l8)
-        | Star(_)       -> (l1, l2, l3, elmt::l4, l5, l6, l7, l8)
-        | Bubble(_)     -> (l1, l2, l3, l4, elmt::l5, l6, l7, l8)
-        | Attractor(_)  -> (l1, l2, l3, l4, l5, elmt::l6, l7, l8)
-        | Wall(_)       -> (l1, l2, l3, l4, l5, l6, elmt::l7, l8)
-        | Monster(_)    -> (l1, l2, l3, l4, l5, l6, l7, elmt::l8)
-    ) ([],[],[],[],[],[],[],[]) lst in [a8;a7;a6;a5;a4;a3;a2;a1]
+        | Player(_)     -> (elmt::l1, l2, l3, l4, l5, l6, l7, l8, l9)
+        | RopeMaker(_)  -> (l1, elmt::l2, l3, l4, l5, l6, l7, l8, l9)
+        | Goal(_)       -> (l1, l2, elmt::l3, l4, l5, l6, l7, l8, l9)
+        | GravField(_)  -> (l1, l2, l3, elmt::l4, l5, l6, l7, l8, l9)
+        | Star(_)       -> (l1, l2, l3, l4, elmt::l5, l6, l7, l8, l9)
+        | Bubble(_)     -> (l1, l2, l3, l4, l5, elmt::l6, l7, l8, l9)
+        | Attractor(_)  -> (l1, l2, l3, l4, l5, l6, elmt::l7, l8, l9)
+        | Wall(_)       -> (l1, l2, l3, l4, l5, l6, l7, elmt::l8, l9)
+        | Monster(_)    -> (l1, l2, l3, l4, l5, l6, l7, l8, elmt::l9)
+    ) ([],[],[],[],[],[],[],[],[]) lst in [a9;a8;a7;a6;a5;a4;a3;a2;a1]
 
 
 (* Just call this function to draw the level
