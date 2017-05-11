@@ -208,3 +208,8 @@ let handle_rope_collision pos rope =    (* TODO *)
         (rstr *. ((rlen -. dist) ** 2.)) **. norm
     else
         (0.,0.)
+
+(* Attraction vector formula. *)
+let attract obj_pos attr_pos attr_str =
+    let pl_to_attr = normalize (attr_pos -.. obj_pos) in
+    (attr_str /. (len_of_vec_sq (obj_pos -.. attr_pos))) **. pl_to_attr

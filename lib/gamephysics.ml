@@ -12,11 +12,6 @@ open Level
 let dt = 0.01
 let air_friction_coef = 0.001
 
-(* Attraction vector formula *)
-let attract obj_pos attr_pos attr_str =
-	let pl_to_attr = normalize (attr_pos -.. obj_pos) in
-	(attr_str /. (len_of_vec_sq (obj_pos -.. attr_pos))) **. pl_to_attr
-
 (* Computes acceleration for a player given its position and the context *)
 let acc_of_context ((pos, _), _, _) ctx =
 	fold_left (fun acc c ->
@@ -42,12 +37,15 @@ let vel_of_player player ctx =
 	let (_, vel, m) = player in
 	apply_der vel accel dt
 
-(* Handles environment collisions then returns a new player and context. *)
+(* Handles environment collisions then returns a new player and context.
+ * This function pretty much describes the behavior of each object a player can interact with,
+ * except modifiers.
+ *)
 let handle_env_collision player context =
 	fold_left (fun (player, nc) elm ->
 		let (sph, vel, m) = player in
 		match elm with
-		
+
 		(* Star grabbing. *)
 		| Star(s) when (check_col_ss sph s) -> ((sph, vel, Point::m), nc)
 		
