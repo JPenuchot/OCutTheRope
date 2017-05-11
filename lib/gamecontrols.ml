@@ -13,7 +13,16 @@ open Catenary
 let rope_mouse_col (opX, opY) (npX, npY) (playerX, playerY) ((ropeX, ropeY), ropeLength, _) =
 	if (opX <> npX || opY <> npY) then begin
 		(* The equation of the catenary *)
-		let cat = getCatenaryFunction playerX playerY ropeX ropeY ropeLength in
+		let cat = 
+			(* Check for verticle rope *)
+			if ((abs_float (playerX-.ropeX)) > 1.) then
+				if (playerX < ropeX) then
+					getCatenaryFunction playerX playerY ropeX ropeY ropeLength
+				else
+					getCatenaryFunction ropeX ropeY playerX playerY ropeLength
+			else
+				(fun x -> playerX)
+		in
 		let fopX = float_of_int opX in
 		let fopY = float_of_int opY in
 		let fnpX = float_of_int npX in
@@ -24,18 +33,23 @@ let rope_mouse_col (opX, opY) (npX, npY) (playerX, playerY) ((ropeX, ropeY), rop
 		in
 		(* TODO: Check intersection between cat(x) and cut(x) *)
 		let rec check fromX toX =
-			if (fromX = toX) then false
+			if (fromX > toX) then false
 			else begin
 				let cutY = cut fromX in
 				let catY = cat fromX in
-				if ((abs_float (cutY -. catY)) <= 1.) then true
+				if ((abs_float (cutY -. catY)) <= 5.) then true
 				else check (fromX +. 1.) toX
 			end
 		in
-		if (opX < npX) then
-			check (float_of_int opX) (float_of_int npX)
-		else
-			check (float_of_int npX) (float_of_int opX)
+
+		let mouseLeft = min fopX fnpX in
+		let mouseRight = max fopX fnpX in
+		let ropeLeft = min playerX ropeX in
+		let ropeRight = max playerX ropeX in
+		let globalLeft = max mouseLeft ropeLeft in
+		let globalRight = min mouseRight ropeRight in
+		check globalLeft globalRight
+
 	end
 	else false
 
