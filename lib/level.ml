@@ -90,13 +90,14 @@ let contains s1 s2 =
 (* Return the position of an object *)
 let objectPosition o =
 	match o with
-	| Player((((x, y), _), _, _)) -> (int_of_float x, int_of_float y)
-	| Star(((x, y), _))           -> (int_of_float x, int_of_float y)
-	| Attractor((x, y), _)        -> (int_of_float x, int_of_float y)
-	| Bubble(((x, y), _), _)      -> (int_of_float x, int_of_float y)
-	| Goal(((x, y), _))           -> (int_of_float x, int_of_float y)
-	| Wall(((x, y), _))           -> (int_of_float x, int_of_float y)
-	| Monster(((x, y), _))        -> (int_of_float x, int_of_float y)
+	| Player((((x, y), _), _, _))
+	| Star(((x, y), _))          
+	| Attractor((x, y), _)       
+	| Bubble(((x, y), _), _)     
+	| Goal(((x, y), _))          
+	| Wall(((x, y), _))          
+	| Monster(((x, y), _))       
+	| GameZone(((x, y), _))       -> (int_of_float x, int_of_float y)
 	| _                           -> (0, 0)
 
 (* Update the position of a gameObject *)
@@ -109,6 +110,7 @@ let updatePosition o x y =
 	| Goal((_, a))           -> Goal(((x, y), a))
 	| Wall((_, a))           -> Wall(((x, y), a))
 	| Monster((_, a))        -> Monster(((x, y), a))
+	| GameZone((_, a))       -> GameZone(((x, y), a))
 	| _                      -> o
 
 (* Detect if a point is in an given game object *)
@@ -116,12 +118,14 @@ let pointIsInObject pointX pointY o =
 	let pX = float_of_int pointX in
 	let pY = float_of_int pointY in
 	match o with
-	| Player((((x, y), radius), _, _))   -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
-	| Star(((x, y), radius))             -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
-	| Attractor((x, y), _)               -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= 25. (* Attractor has only the size of its sprite *)
+	| Player((((x, y), radius), _, _))   
+	| Star(((x, y), radius))             
 	| Bubble(((x, y), radius), _)        -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
-	| Goal(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
-	| Wall(((x, y), (width, height)))    -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| Attractor((x, y), _)               -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= 25. (* Attractor has only the size of its sprite *)
+	| Goal(((x, y), (width, height)))
+	| Wall(((x, y), (width, height)))
+	| Monster(((x, y), (width, height)))
+	| GameZone(((x, y), (width, height)))
 	| Monster(((x, y), (width, height))) -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
 	| _                                  -> false
 
@@ -285,12 +289,13 @@ let level2String level =
 		| h::q -> (
 			match h with
 			| Player(((a, b), c),(d,e),f) -> matchGameObjects (str ^ "\nPlayer(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "),[" ^ (modifiers2String f) ^ "])") q
-			| Goal(((a,b),(c,d)))         -> matchGameObjects (str ^ "\nGoal(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
 			| GravField((a,b))            -> matchGameObjects (str ^ "\nGravField((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "))") q
 			| Star(((a,b),c))             -> matchGameObjects (str ^ "\nStar(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "))") q
 			| Bubble(((a,b),c),(d,e))     -> matchGameObjects (str ^ "\nBubble(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "))") q
 			| Attractor((a,b),c)          -> matchGameObjects (str ^ "\nAttractor((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ ")") q
-			| Wall(((a,b),(c,d)))         -> matchGameObjects (str ^ "\nWall(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| Goal(((a,b),(c,d)))		  -> matchGameObjects (str ^ "\nGoal(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| Wall(((a,b),(c,d)))		  -> matchGameObjects (str ^ "\nWall(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| GameZone(((a,b),(c,d)))	  -> matchGameObjects (str ^ "\nGameZone(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
 			| Monster(((a,b),(c,d)))      -> matchGameObjects (str ^ "\nMonster(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
 		)
 		| [] -> str
