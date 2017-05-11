@@ -13,9 +13,8 @@ open Scripts
 
 (* Default values. *)
 let default_grav = (0., -1.)
-let default_bubble_grav = (0., -1.5)
+let default_bubble_grav = (0., 1.15)
 let default_rope_str = 1.
-let default_attract = 10.
 let default_att_str = 3000.
 
 (* Load a file if there is one given as a parameter *)
@@ -148,7 +147,7 @@ let checkNewObject level =
 		let newObject = Player(((560.,645.),25.),(0.,0.),[]) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-645)
 	else if (playerIn && (sqrt((560.-.(float_of_int pX))**2. +. (645.-.(float_of_int pY))**2.) <= 5.)) then
-		let newRope = Roped(((560.,645.),0.,1.)) in
+		let newRope = Roped(((560.,645.),0.,default_rope_str)) in
 		let levelPlayer = getPlayer level in
 		let newPlayer = addRope newRope levelPlayer in
 		let newLevel = (removeFromLevel levelPlayer level)@[newPlayer] in
@@ -157,10 +156,10 @@ let checkNewObject level =
 		let newObject = Star(((560., 485.), 25.)) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-485)
 	else if (pointIsInObject pX pY (Attractor((560.,405.),0.))) then
-		let newObject = Attractor((560.,405.),-1.) in
+		let newObject = Attractor((560.,405.),default_att_str) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-405)
 	else if (pointIsInObject pX pY (Bubble(((560.,565.),25.),(0.,0.)))) then
-		let newObject = Bubble(((560.,565.),25.),(0.,1.15)) in
+		let newObject = Bubble(((560.,565.),25.),default_bubble_grav) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-565)
 	else if (pointIsInObject pX pY (Goal(((522.,170.),(75.,100.))))) then
 		let newObject = Goal(((522.,170.),(75.,100.))) in
