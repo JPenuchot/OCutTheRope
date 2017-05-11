@@ -150,7 +150,7 @@ let checkNewObject level =
 		let newObject = Star(((560., 485.), 25.)) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-485)
 	else if (pointIsInObject pX pY (Attractor((560.,405.),0.))) then
-		let newObject = Attractor((560.,405.),0.) in
+		let newObject = Attractor((560.,405.),-1.) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-405)
 	else if (pointIsInObject pX pY (Bubble(((560.,565.),25.),(0.,0.)))) then
 		let newObject = Bubble(((560.,565.),25.),(0.,1.15)) in
