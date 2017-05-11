@@ -11,6 +11,13 @@ open Gametypes
 open Http
 open Scripts
 
+(* Default values. *)
+let default_grav = (0., -1.)
+let default_bubble_grav = (0., -1.5)
+let default_rope_str = 1.
+let default_attract = 10.
+let default_att_str = 3000.
+
 (* Load a file if there is one given as a parameter *)
 let level =
 	(*Printf.printf "Loading level\n%!";*)
