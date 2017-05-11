@@ -47,18 +47,34 @@ let handle_env_collision player context =
 	fold_left (fun (player, nc) elm ->
 		let (sph, vel, m) = player in
 		match elm with
-		| Star(s) when (check_col_ss sph s)										-> ((sph, vel, Point::m), nc)
-		| Bubble(s, accel) when (check_col_ss sph s)							-> ((sph, vel, (Bubbled(accel)::m)), nc)
-		| Goal(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Win(getScore m)))
-		| Monster(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Die))
+		
+		(* Star grabbing. *)
+		| Star(s) when (check_col_ss sph s) -> ((sph, vel, Point::m), nc)
+		
+		(* Bubble grabbing. *)
+		| Bubble(s, accel) when (check_col_ss sph s) -> ((sph, vel, (Bubbled(accel)::m)), nc)
+		
+		(* Goal collision detection. *)
+		| Goal(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) ->
+			raise (EndGame(Win(getScore m)))
+		
+		(* Monster collision detection. *)
+		| Monster(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) ->
+			raise (EndGame(Die))
+		
+		(* Wall collision detection. *)
 		| Wall(r) ->
-				let (nsph, nvel) = sr_corner_collide sph r vel in
-				let (nnsph, nnvel) = sr_wall_collide nsph r nvel in
-				((nnsph, nnvel, m), Wall(r)::nc)
-				(* When player gets close enough to a rope maker. *)
+			let (nsph, nvel) = sr_corner_collide sph r vel in
+			let (nnsph, nnvel) = sr_wall_collide nsph r nvel in
+			((nnsph, nnvel, m), Wall(r)::nc)
+		
+		(* When player gets close enough to a rope maker. *)
 		| RopeMaker((spos, slen), rp) when let (ppos, _) = sph in (len_of_vec_sq (spos -.. ppos)) < (slen ** 2.) ->
-				((sph, vel, Roped(rp)::m), nc)
-				(* When player gets out of the borders. *)
-		| _  when let (((px, py),_),_,_) = player in (px < -1000. || py < -1000. || px > 1500. || py > 1700.) -> raise (EndGame(Die))
+			((sph, vel, Roped(rp)::m), nc)
+		
+		(* When player gets out of the borders. *)
+		| _  when let (((px, py),_),_,_) = player in (px < -1000. || py < -1000. || px > 1500. || py > 1700.) ->
+			raise (EndGame(Die))
+		
 		| _ -> (player, (elm::nc))
 	) (player, []) context
