@@ -19,8 +19,7 @@ let default_att_str = 3000.
 
 (* Load a file if there is one given as a parameter *)
 let level =
-	(*Printf.printf "Loading level\n%!";*)
-	if (Array.length Sys.argv) >= 2 then
+	if ((Array.length Sys.argv) >= 2 && Sys.argv.(1) <> "-s") then
 		loadLevel Sys.argv.(1)
 	else
 		failwith "You must specify a level file!"

@@ -154,8 +154,9 @@ let draw_modifiers p m =
 (* Simple function to draw a single element *)
 let draw_single_element element =
     match element with
-    | Player(((posX, posY), radius), _, m) -> draw_image player_sprite    (int_of_float (posX-.radius)) (int_of_float (posY-.radius));
-                                              draw_modifiers element m;
+    | Player(((posX, posY), radius), _, m) -> draw_modifiers element m;
+                                              if (not (checkBubled m)) then
+                                                draw_image player_sprite    (int_of_float (posX-.radius)) (int_of_float (posY-.radius));
     | Goal((posX, posY), _)                -> draw_image goal_sprite      (int_of_float posX) (int_of_float posY)
     | Star((posX, posY), radius)           -> draw_image star_sprite      (int_of_float (posX-.radius)) (int_of_float (posY-.radius))
     | Bubble(((posX, posY), radius), _)    -> draw_image bubble_sprite    (int_of_float (posX-.radius)) (int_of_float (posY-.radius))

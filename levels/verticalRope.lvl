@@ -1,3 +1,0 @@
-# OCutTheRope Level File 1.0
-GravField((0.,-1.))
-Player(((255.,340.),25.),(0.,0.),[Roped(((255.,475.),135.,1.))])

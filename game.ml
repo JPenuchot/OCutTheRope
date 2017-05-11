@@ -45,14 +45,21 @@ let displayNext score =
 		drawCenteredText 250 500 "Your score";
 		drawStars 0 score;
 		drawButton 175 300 150 50 "Next";
-		drawButton 175 200 150 50 "Rage quit";
+		drawButton 175 200 150 50 "Retry";
+		drawButton 175 100 150 50 "Rage quit";
 		synchronize ();
 		(* Wait for a click *)
 		let event = wait_next_event [Button_down] in
 		if event.button then begin
-			if ((event.mouse_x >= 175) && (event.mouse_x <= 325) && (event.mouse_y >= 300) && (event.mouse_y <= 350)) then
-				ignore (wait_next_event [Button_up])
+			if ((event.mouse_x >= 175) && (event.mouse_x <= 325) && (event.mouse_y >= 300) && (event.mouse_y <= 350)) then begin
+				ignore (wait_next_event [Button_up]);
+				0 (* Return 0 to continue *)
+			end
 			else if ((event.mouse_x >= 175) && (event.mouse_x <= 325) && (event.mouse_y >= 200) && (event.mouse_y <= 250)) then begin
+				ignore (wait_next_event [Button_up]);
+				1 (* Return 1 to retry *)
+			end
+			else if ((event.mouse_x >= 175) && (event.mouse_x <= 325) && (event.mouse_y >= 100) && (event.mouse_y <= 150)) then begin
 				ignore (wait_next_event [Button_up]);
 				exit 0
 			end
@@ -102,27 +109,81 @@ let displayRetry () =
 	);
 	wait_click ()
 
+(* Merge all the values of an array *)
+let mergeArray arr =
+	Array.fold_left (fun acc str -> acc ^ "\"" ^ str ^ "\" ") "" arr
+
+(* Allow user to select a style *)
+let styleSelect () =
+	(* Function called on a click *)
+	let buttonAction p =
+		ignore (wait_next_event [Button_up]);
+		close_graph ();
+		ignore (Sys.command ((mergeArray Sys.argv) ^ " -s " ^ p));
+		exit 0
+	in
+	(* Wait a click *)
+	let rec wait_click () =
+		(* Draw *)
+		clear_graph();
+		drawCenteredText 250 550 "Choose a theme....";
+		drawButton 175 400 150 50 "Basic";
+		drawButton 175 300 150 50 "Mario";
+		drawButton 175 200 150 50 "Cut The Rope";
+		synchronize ();
+		(* Wait for a click *)
+		let event = wait_next_event [Button_down] in
+		if event.button then begin
+			if ((event.mouse_x >= 175) && (event.mouse_x <= 325) && (event.mouse_y >= 400) && (event.mouse_y <= 450)) then
+				buttonAction "basic"
+			else if ((event.mouse_x >= 175) && (event.mouse_x <= 325) && (event.mouse_y >= 300) && (event.mouse_y <= 350)) then
+				buttonAction "mario"
+			else if ((event.mouse_x >= 175) && (event.mouse_x <= 325) && (event.mouse_y >= 200) && (event.mouse_y <= 250)) then
+				buttonAction "ctr"
+			else
+				wait_click ()
+		end
+		else
+			wait_click ()
+	in
+	ignore (
+		try
+			set_font "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1"
+		with Graphics.Graphic_failure(_) -> ()
+	);
+	wait_click ()
+
 (* Main function, will increment the level *)
 let rec main levelInfos =
 	try
 		game_loop (snd levelInfos)
 	with
 	| EndGame(Win(score)) -> (
+		let rec wait_up () =
+			if (button_down ()) then
+				wait_up ()
+			else
+				()
+		in
+		wait_up ();
 		let newID = (fst levelInfos) + 1 in
 		try
 			(* Load the next level *)
 			let newLevel = loadLevel ("levels/" ^ (string_of_int newID) ^ ".lvl") in
 			(* Show the score for this level *)
-			displayNext score;
-			(* Launch the new level *)
-			main (newID, newLevel)
+			if ((displayNext score) = 0) then
+				(* Launch the new level *)
+				main (newID, newLevel)
+			else
+				(* Retry *)
+				main levelInfos
 		with LevelLoadError ->
 			(* If the incrementing loading fail, that means we are a the last level, so we win *)
 			displayWin ()
 	)
 	| EndGame(Die) -> (
 		let rec wait_up () =
-			if (button_down ())then
+			if (button_down ()) then
 				wait_up ()
 			else
 				()
@@ -134,6 +195,11 @@ let rec main levelInfos =
 	)
 
 let () =
+
+	(* Detect if a style wasn't given *)
+	if (not (Array.mem "-s" Sys.argv)) then
+		styleSelect ();
+
 	(* Load a file if there is one given as a parameter *)
 	let firstLevel =
 		if ((Array.length Sys.argv) >= 2 && Sys.argv.(1) <> "-s") then

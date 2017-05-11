@@ -133,6 +133,13 @@ let removeModifier m modifierList =
 let getPlayer level =
 	List.find (fun e -> match e with | Player(_) -> true | _ -> false) level
 
+(* Check for Bubbled in a list *)
+let rec checkBubled m =
+	match m with
+	| Bubbled(_)::_ -> true
+	| _::q          -> checkBubled q
+	| []            -> false
+
 (* Return the number of stars of the player *)
 let getScore m =
 	let rec countStars l acc =
