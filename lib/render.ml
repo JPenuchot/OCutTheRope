@@ -162,7 +162,6 @@ let separate_elements lst =
         | Attractor(_)  -> (l1, l2, l3, l4, l5, elmt::l6, l7, l8)
         | Wall(_)       -> (l1, l2, l3, l4, l5, l6, elmt::l7, l8)
         | Monster(_)    -> (l1, l2, l3, l4, l5, l6, l7, elmt::l8)
-        | _ -> (l1, l2, l3, l4, l5, l6, l7, l8)
     ) ([],[],[],[],[],[],[],[]) lst in [a8;a7;a6;a5;a4;a3;a2;a1]
 
 
