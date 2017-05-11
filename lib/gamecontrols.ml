@@ -17,10 +17,15 @@ let rope_mouse_col (opX, opY) (npX, npY) (playerX, playerY) ((ropeX, ropeY), rop
 		let cat = 
 			(* Check for verticle rope *)
 			if (not isVerticle) then
-				if (playerX < ropeX) then
-					getCatenaryFunction playerX playerY ropeX ropeY ropeLength
-				else
-					getCatenaryFunction ropeX ropeY playerX playerY ropeLength
+				(* Check for a too long rope *)
+				if ((sqrt ((playerX-.ropeX)**2. +. (playerY-.ropeY)**2.)) > ropeLength) then
+					(fun x -> ropeY +. ((playerY -. ropeY)/.(playerX -. ropeX))*.(x -. ropeX))
+				else begin
+					if (playerX < ropeX) then
+						getCatenaryFunction playerX playerY ropeX ropeY ropeLength
+					else
+						getCatenaryFunction ropeX ropeY playerX playerY ropeLength
+				end
 			else
 				(fun x -> 0.) (* With a verticle rope, we will not use this function *)
 		in
