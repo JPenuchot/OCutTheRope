@@ -27,19 +27,23 @@ Compile with one of these options
 
 _Note that you must run `sprites/convert.sh` to generate the PPM files from PNG sprites (need ImageMagick)_
 
+## Execution
+Run the game with the command `./game.native [level.lvl] [-s theme]` You can specify a level file (optional) and a theme after `-s`. The defaults themes are `basic` `mario` and `ctr`. Respect the order.
+
 ## To Do list
 
 Things to do (including ideas)
 
 - [X] Set up projet/configuration
-- [X] Sprites converting/loading (`sprites/convert.sh` `ppm.ml`)
-- [ ] Main file (`main.ml`)
-- [X] Physical engine (`physics.ml`)
-- [X] Rendering (`render.ml`)
-- [ ] Management of game mechanics (`gamemechanics.ml`)
+- [X] Sprites converting/loading (`sprites/{THEME}/convert.sh` `lib/ppm.ml`)
+- [X] Main file (`game.ml`)
+- [X] Physical engine
+- [X] Rendering (`lib/render.ml`)
+- [X] Management of game mechanics (`lib/gamemechanics.ml`)
 - [X] Levels management (loading/saving/data structure) (`level.ml`)
 - [ ] Unit tests (`test.ml`) -- FUCK TESTS, WE'RE USING OCAML NOT JAVA FFS
 - [X] WYSIWYG level editor and online level sharing (`editor.ml`)
+- [X] Level downloader (`download.ml`)
 - [ ] Remove secret NASA hacking code from our code
 
 ---

@@ -136,7 +136,7 @@ let rec main levelInfos =
 let () =
 	(* Load a file if there is one given as a parameter *)
 	let firstLevel =
-		if (Array.length Sys.argv) >= 2 then
+		if ((Array.length Sys.argv) >= 2 && Sys.argv.(1) <> "-s") then
 			(-1, loadLevel Sys.argv.(1))
 		else
 			(1, loadLevel "levels/1.lvl")

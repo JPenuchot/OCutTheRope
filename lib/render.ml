@@ -24,27 +24,41 @@ let () =
     (* Enable double buffering, use "synchronize()" to update window *)
     auto_synchronize false
 
+(* Detect the sprites folder from parameters *)
+let sprites_folder =
+    let rec findS n after =
+        if ((Array.length Sys.argv) <= n) then
+            "basic"
+        else if (Sys.argv.(n) = "-s") then
+            findS (n+1) true
+        else if after then
+            Sys.argv.(n)
+        else
+            findS (n+1) after
+    in
+    findS 1 false
+
 (* Load pictures *)
 let background =
-    image_from_ppm "sprites/background.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/background.ppm")
 let player_sprite =
-    image_from_ppm "sprites/player.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/player.ppm")
 let bubble_sprite =
-    image_from_ppm "sprites/bubble.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/bubble.ppm")
 let bubbled_sprite =
-    image_from_ppm "sprites/bubbled.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/bubbled.ppm")
 let star_sprite =
-    image_from_ppm "sprites/star.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/star.ppm")
 let goal_sprite =
-    image_from_ppm "sprites/goal.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/goal.ppm")
 let monster_sprite =
-    image_from_ppm "sprites/monster.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/monster.ppm")
 let wall_sprite =
-    image_from_ppm "sprites/wall.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/wall.ppm")
 let attractor_sprite =
-    image_from_ppm "sprites/attractor.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/attractor.ppm")
 let unknow_sprite =
-    image_from_ppm "sprites/unknow.ppm"
+    image_from_ppm ("sprites/" ^ sprites_folder ^ "/unknow.ppm")
 
 type typePlayerInfos = {
     x : float;
