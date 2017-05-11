@@ -275,7 +275,7 @@ let rec main level =
 		if isGravity then
 			saveLevel level Sys.argv.(1)
 		else
-			saveLevel ((GravField((0.,-1.)))::level) Sys.argv.(1);
+			saveLevel ((GravField(default_grav))::level) Sys.argv.(1);
 		exit 0
 
 let () =
