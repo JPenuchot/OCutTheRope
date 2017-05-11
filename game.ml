@@ -9,9 +9,9 @@ open Gui
 (* Display a win message *)
 let displayWin () =
 	let rec wait () =
-		moveto 50 50;
 		drawCenteredText 250 400 "Congratulations, you win!";
 		synchronize ();
+		ignore (wait_next_event [Button_down]);
 		wait ()
 	in
 	clear_graph();
