@@ -13,8 +13,8 @@ let air_friction_coef = 0.001
 
 (* Attraction vector formula *)
 let attract obj_pos attr_pos attr_str =
-	let pl_to_attr = normalize (obj_pos -.. attr_pos) in
-	(attr_str /. (len_of_vec (obj_pos -.. attr_pos) ** 2.)) **. pl_to_attr
+	let pl_to_attr = normalize (attr_pos -.. obj_pos) in
+	(attr_str /. (len_of_vec_sq (obj_pos -.. attr_pos))) **. pl_to_attr
 
 (* Computes acceleration for a player given its position and the context *)
 let acc_of_context ((pos, _), _, _) ctx =
