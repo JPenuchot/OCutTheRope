@@ -12,16 +12,20 @@ open Catenary
 (* Checks for a collision between a rope and the mouse cursor. *)
 let rope_mouse_col (opX, opY) (npX, npY) (playerX, playerY) ((ropeX, ropeY), ropeLength, _) =
 	if (opX <> npX || opY <> npY) then begin
+		let isVerticle =
+			(abs_float (playerX-.ropeX)) < 1.
+		in
 		(* The equation of the catenary *)
 		let cat = 
 			(* Check for verticle rope *)
-			if ((abs_float (playerX-.ropeX)) > 1.) then
+			if isVerticle then
 				if (playerX < ropeX) then
 					getCatenaryFunction playerX playerY ropeX ropeY ropeLength
 				else
 					getCatenaryFunction ropeX ropeY playerX playerY ropeLength
-			else
+			else begin
 				(fun x -> playerX)
+			end
 		in
 		let fopX = float_of_int opX in
 		let fopY = float_of_int opY in
@@ -36,9 +40,18 @@ let rope_mouse_col (opX, opY) (npX, npY) (playerX, playerY) ((ropeX, ropeY), rop
 			if (fromX > toX) then false
 			else begin
 				let cutY = cut fromX in
-				let catY = cat fromX in
-				if ((abs_float (cutY -. catY)) <= 5.) then true
-				else check (fromX +. 1.) toX
+				if isVerticle then begin
+					Printf.printf "%f E [%f, %f]\n%!" cutY (min playerX ropeX) (max playerY ropeY);
+					if ((min playerX ropeX) <= cutY) && ((max playerY ropeY) >= cutY) then
+						true
+					else
+						check (fromX +. 0.0001) toX
+				end
+				else begin
+					let catY = cat fromX in
+					if ((abs_float (cutY -. catY)) <= 5.) then true
+					else check (fromX +. 0.0001) toX
+				end
 			end
 		in
 
