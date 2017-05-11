@@ -55,7 +55,9 @@ let handle_env_collision player context =
 				let (nsph, nvel) = sr_corner_collide sph r vel in
 				let (nnsph, nnvel) = sr_wall_collide nsph r nvel in
 				((nnsph, nnvel, m), Wall(r)::nc)
-		
+				(* When player gets close enough to a rope maker. *)
+		| RopeMaker((spos, slen), rp) when let (ppos, _) = sph in (len_of_vec_sq (spos -.. ppos)) < (slen ** 2.) ->
+				((sph, vel, Roped(rp)::m), nc)
 				(* When player gets out of the borders. *)
 		| _  when let (((px, py),_),_,_) = player in (px < -1000. || py < -1000. || px > 1500. || py > 1700.) -> raise (EndGame(Die))
 		| _ -> (player, (elm::nc))
