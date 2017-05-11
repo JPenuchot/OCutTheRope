@@ -53,7 +53,7 @@ let print_context ctx =
 (* Manages timing for rendering calls etc. *)
 let game_loop context =
 	let nt = create (fun () -> delay (1. /. 60.)) () in
-	
+	let (mouseX, mouseY) = mouse_pos () in
 	let rec gloop context it t x y = (* x and y are the last mouse positions *)
 		let (nX, nY) = mouse_pos () in
 		if (it mod num_sims == 0) then	(* Creating a thread that will sleep during 1/60 sec *)
@@ -67,4 +67,4 @@ let game_loop context =
 		else
 			let nc = (iterate_game context x y) in
 			gloop nc (it + 1) t nX nY
-	in gloop context 1 nt 0 0
+	in gloop context 1 nt mouseX mouseY

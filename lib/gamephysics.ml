@@ -7,6 +7,7 @@
 open Basephysics
 open Gametypes
 open List
+open Level
 
 let dt = 0.01
 let air_friction_coef = 0.001
@@ -48,7 +49,7 @@ let handle_env_collision player context =
 		match elm with
 		| Star(s) when (check_col_ss sph s)										-> ((sph, vel, Point::m), nc)
 		| Bubble(s, accel) when (check_col_ss sph s)							-> ((sph, vel, (Bubbled(accel)::m)), nc)
-		| Goal(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Win))
+		| Goal(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Win(getScore m)))
 		| Monster(r) when (check_col_corner_sr sph r) || (check_col_wall_sr sph r) -> raise (EndGame(Die))
 		| Wall(r) ->
 				let (nsph, nvel) = sr_corner_collide sph r vel in

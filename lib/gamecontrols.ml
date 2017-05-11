@@ -43,7 +43,6 @@ let rope_mouse_col (opX, opY) (npX, npY) (playerX, playerY) ((ropeX, ropeY), rop
 			else begin
 				let cutY = cut fromX in
 				if isVerticle then begin
-					Printf.printf "%f E [%f, %f]\n%!" cutY (min playerX ropeX) (max playerY ropeY);
 					if ((min playerX ropeX) <= cutY) && ((max playerY ropeY) >= cutY) then
 						true
 					else

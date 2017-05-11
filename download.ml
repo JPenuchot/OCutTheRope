@@ -7,6 +7,7 @@
 open Graphics
 open Http
 open Scripts
+open Gui
 
 (* unit -> (string * string) list 
  * Return a list of string couple, (level id, level description) *)
@@ -32,18 +33,6 @@ let rec printStringCoupleList l =
 
 (* Main function *)
 let rec ocaMain levels i =
-	(* Draw a button *)
-	let drawButton x y width height text =
-		set_color (rgb 127 127 127);
-		fill_rect (x+5) (y-5) width height;
-		set_color (rgb 200 200 200);
-		fill_rect x y width height;
-		set_color black;
-		draw_rect x y width height;
-		let textSize = text_size text in
-		moveto (x + (width-(fst textSize))/2) (y + (height-(snd textSize))/2);
-		draw_string text
-	in
 	(* Draw a button list *)
 	let rec drawList l from =
 		match l with

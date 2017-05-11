@@ -133,6 +133,16 @@ let removeModifier m modifierList =
 let getPlayer level =
 	List.find (fun e -> match e with | Player(_) -> true | _ -> false) level
 
+(* Return the number of stars of the player *)
+let getScore m =
+	let rec countStars l acc =
+		match l with
+		| Point::q -> countStars q (acc+1)
+		| _::q     -> countStars q acc
+		| []       -> acc
+	in
+	countStars m 0
+
 (* Return an array of string representing the result of matched_group for a given regexp *)
 let get_matched_groups exp str =
 	(* Match the string for using matched_group *)
@@ -226,6 +236,9 @@ let loadObject str =
 					))
 	| _    -> raise UnknowGameObject
 
+(* The exception returned if the level is not found or innaccessible *)
+exception LevelLoadError
+
 (* The level header *)
 let defaultLevelHeader = "# OCutTheRope Level File 1.0"
 
@@ -236,7 +249,7 @@ let loadLevel file =
 		(* The file must have "# OCutTheRope Level File 1.0" on it's first line *)
 		if check_header then begin
 			if (input_line handle) <> defaultLevelHeader then
-				failwith "Level file header not found or incorrect!";
+				raise LevelLoadError;
 			read_file handle false level
 		end
 		else begin
@@ -256,7 +269,7 @@ let loadLevel file =
 		if (contains Sys.executable_name "editor") then
 			[]
 		else
-			failwith "Unable to open file!"
+			raise LevelLoadError
 
 
 (* Transforms modifiers to string *)
