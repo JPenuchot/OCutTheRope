@@ -103,8 +103,19 @@ let rec drawRope (x1, y1) (x2, y2) l inv =
         drawCurve x1 x2 1. (getCatenaryFunction x1 y1 x2 y2 l)
     end
 
+(* Separates modifiers for rendering *)
+let separate_modifiers m =
+    let (bl, rl) =
+    fold_left (fun (bl, rl) elm ->
+        match elm with
+        | Roped(_)      ->  (elm::bl, rl)
+        | Bubbled(_)    ->  (bl, elm::rl)
+        | _ -> (bl, rl)
+    ) ([], []) m in
+    [rl; bl]
+
 (* Draw the modifiers of a player *)
-let rec draw_modifiers p m =
+let rec draw_mods p m =
     (* Get player informations *)
     let playerInfos =
         match p with
@@ -118,8 +129,13 @@ let rec draw_modifiers p m =
         | Bubbled(_)           -> draw_image bubbled_sprite (int_of_float (playerInfos.x-.playerInfos.r)) (int_of_float (playerInfos.y-.playerInfos.r))
         | Roped(((x,y),len,_)) -> drawRope (playerInfos.x, playerInfos.y) (x, y) len false
         | _                    -> ()
-    ); draw_modifiers p q
+    ); draw_mods p q
     | []   -> ()
+
+let draw_modifiers p m =
+    fold_left(fun _ lm ->
+        draw_mods p lm
+    ) () (separate_modifiers m)
 
 (* Simple function to draw a single element *)
 let draw_single_element element =

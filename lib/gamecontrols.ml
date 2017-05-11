@@ -49,7 +49,7 @@ let player_mouse_col oldPos mpos ((spos, slen), vel, mods) =
 		match elm with
 		| Bubbled(_) when (len_of_vec_sq (spos -.. fmpos) < slensq) -> acc
 		| Roped(r) when rope_mouse_col oldPos (npX, npY) spos r -> acc
-		| v -> v::acc
+		| _ -> elm::acc
 	) [] mods
 	in ((spos, slen), vel, nmods)
 
@@ -60,7 +60,7 @@ let handle_mouse_col ctx x y =
 		fold_left (fun acc elm ->
 			match elm with
 			| Player(p) -> Player((player_mouse_col (x, y) (xpos, ypos) p))::acc
-			| v -> v::acc
+			| _ -> elm::acc
 		) [] ctx
 	else
 		ctx
