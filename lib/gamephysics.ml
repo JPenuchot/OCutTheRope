@@ -67,7 +67,8 @@ let handle_env_collision player context =
 			((nnsph, nnvel, m), Wall(r)::nc)
 		
 		(* When player gets close enough to a rope maker. *)
-		| RopeMaker((spos, slen), rp) when let (ppos, _) = sph in (len_of_vec_sq (spos -.. ppos)) < (slen ** 2.) ->
+		(*| RopeMaker((spos, slen), rp) when let (ppos, _) = sph in (len_of_vec_sq (spos -.. ppos)) < (slen ** 2.) ->*)
+		| RopeMaker((rsph), rp) when (check_col_ss rsph sph) ->
 			((sph, vel, Roped(rp)::m), nc)
 		
 		(* When player gets out of the borders. *)

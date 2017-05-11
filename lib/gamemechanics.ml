@@ -22,7 +22,7 @@ let iterate_player (sph, vel, modif) context =
 	let (pos, len) = sph in
 	let npos = apply_der pos nvel dt in
 
-	(* Handling collisions *)
+	(* Handling environment collisions *)
 	let (np, nc) = handle_env_collision ((npos, len), nvel, modif) context in
 	(np, nc)
 
