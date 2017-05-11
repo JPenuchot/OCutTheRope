@@ -28,7 +28,6 @@ type gameObject =
 	| Attractor	of pos * float
 	| Wall		of rect
 	| Monster	of rect
-	| GameZone  of rect
 
 (* A context (level state) is described by a list of objects. *)
 type context = gameObject list

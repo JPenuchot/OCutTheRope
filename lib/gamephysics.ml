@@ -54,5 +54,8 @@ let handle_env_collision player context =
 				let (nsph, nvel) = sr_corner_collide sph r vel in
 				let (nnsph, nnvel) = sr_wall_collide nsph r nvel in
 				((nnsph, nnvel, m), Wall(r)::nc)
+		
+				(* When player gets out of the borders. *)
+		| _  when let (((px, py),_),_,_) = player in (px < -50. || py < -50. || px > 550. || py > 750.) -> raise (EndGame(Die))
 		| _ -> (player, (elm::nc))
 	) (player, []) context

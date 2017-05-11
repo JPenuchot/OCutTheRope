@@ -96,8 +96,7 @@ let objectPosition o =
 	| Bubble(((x, y), _), _)     
 	| Goal(((x, y), _))          
 	| Wall(((x, y), _))          
-	| Monster(((x, y), _))       
-	| GameZone(((x, y), _))       -> (int_of_float x, int_of_float y)
+	| Monster(((x, y), _))       -> (int_of_float x, int_of_float y)
 	| _                           -> (0, 0)
 
 (* Update the position of a gameObject *)
@@ -110,7 +109,6 @@ let updatePosition o x y =
 	| Goal((_, a))           -> Goal(((x, y), a))
 	| Wall((_, a))           -> Wall(((x, y), a))
 	| Monster((_, a))        -> Monster(((x, y), a))
-	| GameZone((_, a))       -> GameZone(((x, y), a))
 	| _                      -> o
 
 (* Detect if a point is in an given game object *)
@@ -124,8 +122,6 @@ let pointIsInObject pointX pointY o =
 	| Attractor((x, y), _)               -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= 25. (* Attractor has only the size of its sprite *)
 	| Goal(((x, y), (width, height)))
 	| Wall(((x, y), (width, height)))
-	| Monster(((x, y), (width, height)))
-	| GameZone(((x, y), (width, height)))
 	| Monster(((x, y), (width, height))) -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
 	| _                                  -> false
 
@@ -295,7 +291,6 @@ let level2String level =
 			| Attractor((a,b),c)          -> matchGameObjects (str ^ "\nAttractor((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ ")") q
 			| Goal(((a,b),(c,d)))		  -> matchGameObjects (str ^ "\nGoal(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
 			| Wall(((a,b),(c,d)))		  -> matchGameObjects (str ^ "\nWall(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
-			| GameZone(((a,b),(c,d)))	  -> matchGameObjects (str ^ "\nGameZone(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
 			| Monster(((a,b),(c,d)))      -> matchGameObjects (str ^ "\nMonster(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
 		)
 		| [] -> str
