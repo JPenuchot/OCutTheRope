@@ -196,7 +196,7 @@ let checkNewObject level =
 		dragObject newObject (level@[newObject]) (pX-510) (pY-25) false
 	else if (pointIsInObject pX pY (RopeMaker(((560., 500.), 25.), ((0., 0.), 0., 0.)))) then
 		let newObject = RopeMaker(((560., 500.), 50.), ((560., 500.), 60., 1.)) in
-		dragObject newObject (level@[newObject]) (pX-650+85) (pY-500) false
+		dragObject newObject (level@[newObject]) (pX-650+93) (pY-500) false
 	else
 		level
 
