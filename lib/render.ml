@@ -162,6 +162,7 @@ let draw_single_element element =
     | Wall((posX, posY), _)                -> draw_image wall_sprite      (int_of_float posX) (int_of_float posY)
     | Monster((posX, posY), _)             -> draw_image monster_sprite   (int_of_float posX) (int_of_float posY)
     | RopeMaker(((posX, posY), radius), _) -> let iposX = int_of_float posX in let iposY = int_of_float posY in
+                                                set_line_width 1;
                                                 fill_circle iposX iposY 5;
                                                 draw_circle iposX iposY (int_of_float radius)
     | _                                    -> ()

@@ -40,6 +40,7 @@ let draw_menu drawPlayer =
 	else
 		fill_circle 560 640 5;
 	draw_image bubble_sprite 535 545;
+	set_line_width 1;
     fill_circle 560 500 5;
     draw_circle 560 500 25;
 	draw_image star_sprite 535 405;
@@ -169,7 +170,7 @@ let checkNewObject level =
 	if ((not playerIn) && (pointIsInObject pX pY (Player(((560.,640.),25.),(0.,0.),[])))) then
 		let newObject = Player(((560.,640.),25.),(0.,0.),[]) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-640) false
-	else if (playerIn && (sqrt((560.-.(float_of_int pX))**2. +. (645.-.(float_of_int pY))**2.) <= 5.)) then
+	else if (playerIn && (sqrt((560.-.(float_of_int pX))**2. +. (640.-.(float_of_int pY))**2.) <= 5.)) then
 		let newRope = Roped(((560.,645.),0.,default_rope_str)) in
 		let levelPlayer = getPlayer level in
 		let newPlayer = addRope newRope levelPlayer in
