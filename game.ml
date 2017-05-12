@@ -166,20 +166,20 @@ let rec main levelInfos =
 				()
 		in
 		wait_up ();
-		let newID = (fst levelInfos) + 1 in
-		try
-			(* Load the next level *)
-			let newLevel = loadLevel ("levels/" ^ (string_of_int newID) ^ ".lvl") in
-			(* Show the score for this level *)
-			if ((displayNext score) = 0) then
+		let newID = (fst levelInfos) + 1 in(* Show the score for this level *)
+		if ((displayNext score) = 0) then begin
+			try
+				(* Load the next level *)
+				let newLevel = loadLevel ("levels/" ^ (string_of_int newID) ^ ".lvl") in
 				(* Launch the new level *)
 				main (newID, newLevel)
-			else
-				(* Retry *)
-				main levelInfos
-		with LevelLoadError ->
-			(* If the incrementing loading fail, that means we are a the last level, so we win *)
-			displayWin ()
+			with LevelLoadError ->
+				(* If the incrementing loading fail, that means we are a the last level, so we win *)
+				displayWin ()
+		end
+		else
+			(* Retry *)
+			main levelInfos
 	)
 	| EndGame(Die) -> (
 		let rec wait_up () =
