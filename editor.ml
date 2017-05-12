@@ -44,7 +44,9 @@ let draw_menu drawPlayer =
 	draw_image attractor_sprite 535 380;
 	draw_image wall_sprite 535 300;
 	draw_image goal_sprite 522 170;
-	draw_image monster_sprite 510 40
+	draw_image monster_sprite 510 40;
+    fill_circle 535 500 5;
+    draw_circle 535 500 50;
 
 (* Detect the element under the mouse *)
 let rec getPointedObject x y level =
