@@ -39,14 +39,14 @@ let draw_menu drawPlayer =
 		draw_image player_sprite 535 620
 	else
 		fill_circle 560 645 5;
-	draw_image bubble_sprite 535 540;
+	draw_image bubble_sprite 535 560;
 	draw_image star_sprite 535 460;
 	draw_image attractor_sprite 535 380;
 	draw_image wall_sprite 535 300;
 	draw_image goal_sprite 522 170;
 	draw_image monster_sprite 510 40;
-    fill_circle 535 500 5;
-    draw_circle 535 500 50;
+    fill_circle 560 500 5;
+    draw_circle 560 500 25
 
 (* Detect the element under the mouse *)
 let rec getPointedObject x y level =
@@ -159,8 +159,8 @@ let checkNewObject level =
 	else if (pointIsInObject pX pY (Attractor((560.,405.),0.))) then
 		let newObject = Attractor((560.,405.),default_att_str) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-405)
-	else if (pointIsInObject pX pY (Bubble(((560.,565.),25.),(0.,0.)))) then
-		let newObject = Bubble(((560.,565.),25.),default_bubble_grav) in
+	else if (pointIsInObject pX pY (Bubble(((560.,575.),25.),(0.,0.)))) then
+		let newObject = Bubble(((560.,585.),25.),default_bubble_grav) in
 		dragObject newObject (level@[newObject]) (pX-560) (pY-565)
 	else if (pointIsInObject pX pY (Goal(((522.,170.),(75.,100.))))) then
 		let newObject = Goal(((522.,170.),(75.,100.))) in
