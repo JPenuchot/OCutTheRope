@@ -38,7 +38,7 @@ let iterate_game context x y =
 
 (* Prints a context, mostly for debug... *)
 let print_context ctx =
-	fold_left(fun _ v ->
+	iter(fun v ->
 		match v with
 		| Player(_)		-> print_string "Player\n"
 		| Goal(_)		-> print_string "Goal\n"
@@ -49,7 +49,7 @@ let print_context ctx =
 		| Wall(_)		-> print_string "Wall\n"
 		| Monster(_)	-> print_string "Monster\n"
 		| RopeMaker(_)	-> print_string "RopeMaker\n"
-	) () ctx
+	) ctx
 
 (* Manages timing for rendering calls etc. *)
 let game_loop context =
