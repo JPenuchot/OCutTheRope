@@ -36,17 +36,17 @@ let draw_menu drawPlayer =
 	moveto 520 680;
 	draw_string "Upload level";
 	if drawPlayer then
-		draw_image player_sprite 535 620
+		draw_image player_sprite 535 615
 	else
-		fill_circle 560 645 5;
-	draw_image bubble_sprite 535 560;
-	draw_image star_sprite 535 460;
-	draw_image attractor_sprite 535 380;
-	draw_image wall_sprite 535 300;
-	draw_image goal_sprite 522 170;
-	draw_image monster_sprite 510 40;
+		fill_circle 560 640 5;
+	draw_image bubble_sprite 535 545;
     fill_circle 560 500 5;
-    draw_circle 560 500 25
+    draw_circle 560 500 25;
+	draw_image star_sprite 535 405;
+	draw_image attractor_sprite 535 335;
+	draw_image wall_sprite 535 265;
+	draw_image goal_sprite 522 145;
+	draw_image monster_sprite 510 25
 
 (* Detect the element under the mouse *)
 let rec getPointedObject x y level =
@@ -63,24 +63,46 @@ let getPointedRope x y m =
 	) (false, Point) m
 
 (* Drag an objet until mouse released
- * @params: o     The object to move
- *          level The current context
- *          rX    The X coord relative to the object
- *          rY    The Y coord relative to the object
+ * @params: o      The object to move
+ *          level  The current context
+ *          rX     The X coord relative to the object
+ *          rY     The Y coord relative to the object
+ $          resize Boolean that means we want to resize a RopeMaker
  *)
-let rec dragObject o level rX rY =
-	let event = wait_next_event [Button_up; Mouse_motion] in
-	(* If the mouse button is still pressed *)
-	if event.button then begin
-		(* Create the new moved object (only on a mutiple of 5) *)
-		let newObject = updatePosition o (float_of_int ((event.mouse_x-rX)/5*5)) (float_of_int ((event.mouse_y-rY)/5*5)) in
-		(* Redraw the level *)
-		draw_level_editor level false;
-		draw_menu (not (containsPlayer level));
-		synchronize ();
-		(* Reccursive call with the context where the old object is replaced with the new one *)
-		dragObject newObject ((removeFromLevel o level)@[newObject]) rX rY
-	end else level
+let rec dragObject o level rX rY resize =
+	(* Try to see if it's a RopeMaker resizing *)
+	match o with
+	| RopeMaker(((x, y), _), _) when resize -> (
+		let event = wait_next_event [Mouse_motion; Key_pressed] in
+		if (event.keypressed && (event.key = 's')) then
+			level
+		else begin
+			(* Create the new rope *)
+			let dist = sqrt (((float_of_int event.mouse_x)-.x)**2. +. ((float_of_int event.mouse_y)-.y)**2.) in
+			let newRopeMaker = RopeMaker(((x, y), dist), ((x, y), dist+.20., 1.)) in
+			(* Redraw the level *)
+			draw_level_editor level false;
+			draw_menu (not (containsPlayer level));
+			synchronize ();
+			(* Reccursive call with the context where the old object is replaced with the new one *)
+			dragObject newRopeMaker ((removeFromLevel o level)@[newRopeMaker]) rX rY resize
+		end
+	)
+	| _ -> (
+		let event = wait_next_event [Button_up; Mouse_motion] in
+		(* If the mouse button is still pressed *)
+		if event.button then begin
+			(* Create the new moved object (only on a mutiple of 5) *)
+			let newObject = updatePosition o (float_of_int ((event.mouse_x-rX)/5*5)) (float_of_int ((event.mouse_y-rY)/5*5)) in
+			(* Redraw the level *)
+			draw_level_editor level false;
+			draw_menu (not (containsPlayer level));
+			synchronize ();
+			(* Reccursive call with the context where the old object is replaced with the new one *)
+			dragObject newObject ((removeFromLevel o level)@[newObject]) rX rY resize
+		end
+		else level
+	)
 
 (* Update the posotion of a rope *)
 let updateRopePosition r nX nY p =
@@ -144,33 +166,36 @@ let checkNewObject level =
 	let pX = fst (mouse_pos()) in
 	let pY = snd (mouse_pos()) in
 	let playerIn = containsPlayer level in
-	if ((not playerIn) && (pointIsInObject pX pY (Player(((560.,645.),25.),(0.,0.),[])))) then
-		let newObject = Player(((560.,645.),25.),(0.,0.),[]) in
-		dragObject newObject (level@[newObject]) (pX-560) (pY-645)
+	if ((not playerIn) && (pointIsInObject pX pY (Player(((560.,640.),25.),(0.,0.),[])))) then
+		let newObject = Player(((560.,640.),25.),(0.,0.),[]) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-640) false
 	else if (playerIn && (sqrt((560.-.(float_of_int pX))**2. +. (645.-.(float_of_int pY))**2.) <= 5.)) then
 		let newRope = Roped(((560.,645.),0.,default_rope_str)) in
 		let levelPlayer = getPlayer level in
 		let newPlayer = addRope newRope levelPlayer in
 		let newLevel = (removeFromLevel levelPlayer level)@[newPlayer] in
 		dragRope newRope newLevel newPlayer
-	else if (pointIsInObject pX pY (Star(((560., 485.), 25.)))) then
-		let newObject = Star(((560., 485.), 25.)) in
-		dragObject newObject (level@[newObject]) (pX-560) (pY-485)
-	else if (pointIsInObject pX pY (Attractor((560.,405.),0.))) then
-		let newObject = Attractor((560.,405.),default_att_str) in
-		dragObject newObject (level@[newObject]) (pX-560) (pY-405)
-	else if (pointIsInObject pX pY (Bubble(((560.,575.),25.),(0.,0.)))) then
-		let newObject = Bubble(((560.,585.),25.),default_bubble_grav) in
-		dragObject newObject (level@[newObject]) (pX-560) (pY-565)
-	else if (pointIsInObject pX pY (Goal(((522.,170.),(75.,100.))))) then
-		let newObject = Goal(((522.,170.),(75.,100.))) in
-		dragObject newObject (level@[newObject]) (pX-522) (pY-170)
-	else if (pointIsInObject pX pY (Wall(((535.,300.),(50.,50.))))) then
-		let newObject = Wall(((535.,300.),(50.,50.))) in
-		dragObject newObject (level@[newObject]) (pX-535) (pY-300)
-	else if (pointIsInObject pX pY (Monster(((510.,40.),(100.,100.))))) then
-		let newObject = Monster(((510.,40.),(100.,100.))) in
-		dragObject newObject (level@[newObject]) (pX-510) (pY-40)
+	else if (pointIsInObject pX pY (Star(((560., 430.), 25.)))) then
+		let newObject = Star(((560., 430.), 25.)) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-430) false
+	else if (pointIsInObject pX pY (Attractor((560.,360.),0.))) then
+		let newObject = Attractor((560.,360.),default_att_str) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-360) false
+	else if (pointIsInObject pX pY (Bubble(((560.,570.),25.),(0.,0.)))) then
+		let newObject = Bubble(((560.,570.),25.),default_bubble_grav) in
+		dragObject newObject (level@[newObject]) (pX-560) (pY-570) false
+	else if (pointIsInObject pX pY (Goal(((522.,145.),(75.,100.))))) then
+		let newObject = Goal(((522.,145.),(75.,100.))) in
+		dragObject newObject (level@[newObject]) (pX-522) (pY-145) false
+	else if (pointIsInObject pX pY (Wall(((535.,265.),(50.,50.))))) then
+		let newObject = Wall(((535.,265.),(50.,50.))) in
+		dragObject newObject (level@[newObject]) (pX-535) (pY-265) false
+	else if (pointIsInObject pX pY (Monster(((510.,25.),(100.,100.))))) then
+		let newObject = Monster(((510.,25.),(100.,100.))) in
+		dragObject newObject (level@[newObject]) (pX-510) (pY-25) false
+	else if (pointIsInObject pX pY (RopeMaker(((560., 500.), 25.), ((0., 0.), 0., 0.)))) then
+		let newObject = RopeMaker(((560., 500.), 50.), ((560., 500.), 60., 1.)) in
+		dragObject newObject (level@[newObject]) (pX-650+85) (pY-500) false
 	else
 		level
 
@@ -238,7 +263,7 @@ let rec main level =
 			(* Calculate the mouse position relative to the object *)
 			let objectPos = objectPosition (snd pointed) in
 			(* Drag the object *)
-			let newLevel = dragObject (snd pointed) level (event.mouse_x-(fst objectPos)) (event.mouse_y-(snd objectPos)) in
+			let newLevel = dragObject (snd pointed) level (event.mouse_x-(fst objectPos)) (event.mouse_y-(snd objectPos)) (event.key = 's') in
 			(* Reccursive call on the new level *)
 			main newLevel
 		end else begin
