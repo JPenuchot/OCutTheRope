@@ -55,6 +55,8 @@ let regExpWall =
 	"\\(Wall(" ^ regExpRect ^ ")\\)"
 let regExpMonster =
 	"\\(Monster(" ^ regExpRect ^ ")\\)"
+let regExpRopeMaker =
+	"\\(RopeMaker(" ^ regExpSphere ^ "," ^ regExpRope ^ ")\\)"
 (* Match any gameObject *)
 let regExpGameObject =
 	"^\\(" ^
@@ -65,7 +67,8 @@ let regExpGameObject =
 		regExpBubble ^ "\\|" ^
 		regExpAttractor ^ "\\|" ^
 		regExpWall ^ "\\|" ^
-		regExpMonster ^
+		regExpMonster ^ "\\|" ^
+		regExpRopeMaker ^
 	"\\)$"
 let regExpLine = regexp regExpGameObject
 
@@ -87,13 +90,13 @@ let contains s1 s2 =
 let objectPosition o =
 	match o with
 	| Player((((x, y), _), _, _))
-	| Star(((x, y), _))          
-	| Attractor((x, y), _)       
-	| Bubble(((x, y), _), _)     
-	| Goal(((x, y), _))          
-	| Wall(((x, y), _))          
+	| Star(((x, y), _))
+	| Attractor((x, y), _)
+	| Bubble(((x, y), _), _)
+	| Goal(((x, y), _))
+	| Wall(((x, y), _))
 	| Monster(((x, y), _))       -> (int_of_float x, int_of_float y)
-	| _                           -> (0, 0)
+	| _                          -> (0, 0)
 
 (* Update the position of a gameObject *)
 let updatePosition o x y =
@@ -241,6 +244,11 @@ let loadObject str =
 						((float_of_string monsterGroups.(4)), (float_of_string monsterGroups.(5))),
 						((float_of_string monsterGroups.(7)), (float_of_string monsterGroups.(8)))
 					))
+	| "Ro" -> let ropeMakerGroups = get_matched_groups (regexp regExpRopeMaker) str in
+				RopeMaker(
+					(((float_of_string ropeMakerGroups.(4)),(float_of_string ropeMakerGroups.(5))),(float_of_string ropeMakerGroups.(6))),
+					(((float_of_string ropeMakerGroups.(9)),(float_of_string ropeMakerGroups.(10))),(float_of_string ropeMakerGroups.(11)),(float_of_string ropeMakerGroups.(12)))
+				)
 	| _    -> raise UnknowGameObject
 
 (* The exception returned if the level is not found or innaccessible *)
@@ -300,14 +308,15 @@ let level2String level =
 		match level with
 		| h::q -> (
 			match h with
-			| Player(((a, b), c),(d,e),f) -> matchGameObjects (str ^ "\nPlayer(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "),[" ^ (modifiers2String f) ^ "])") q
-			| GravField((a,b))            -> matchGameObjects (str ^ "\nGravField((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "))") q
-			| Star(((a,b),c))             -> matchGameObjects (str ^ "\nStar(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "))") q
-			| Bubble(((a,b),c),(d,e))     -> matchGameObjects (str ^ "\nBubble(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "))") q
-			| Attractor((a,b),c)          -> matchGameObjects (str ^ "\nAttractor((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ ")") q
-			| Goal(((a,b),(c,d)))		  -> matchGameObjects (str ^ "\nGoal(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
-			| Wall(((a,b),(c,d)))		  -> matchGameObjects (str ^ "\nWall(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
-			| Monster(((a,b),(c,d)))      -> matchGameObjects (str ^ "\nMonster(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| Player(((a, b), c),(d,e),f)      -> matchGameObjects (str ^ "\nPlayer(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "),[" ^ (modifiers2String f) ^ "])") q
+			| GravField((a,b))                 -> matchGameObjects (str ^ "\nGravField((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "))") q
+			| Star(((a,b),c))                  -> matchGameObjects (str ^ "\nStar(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "))") q
+			| Bubble(((a,b),c),(d,e))          -> matchGameObjects (str ^ "\nBubble(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),(" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ "))") q
+			| Attractor((a,b),c)               -> matchGameObjects (str ^ "\nAttractor((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ ")") q
+			| Goal(((a,b),(c,d)))		       -> matchGameObjects (str ^ "\nGoal(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| Wall(((a,b),(c,d)))		       -> matchGameObjects (str ^ "\nWall(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| Monster(((a,b),(c,d)))           -> matchGameObjects (str ^ "\nMonster(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ "),(" ^ (string_of_float c) ^ "," ^ (string_of_float d) ^ ")))") q
+			| RopeMaker(((a,b),c),((d,e),f,g)) -> matchGameObjects (str ^ "\nRopeMaker(((" ^ (string_of_float a) ^ "," ^ (string_of_float b) ^ ")," ^ (string_of_float c) ^ "),((" ^ (string_of_float d) ^ "," ^ (string_of_float e) ^ ")," ^ (string_of_float f) ^ "," ^ (string_of_float g) ^ "))") q
 		)
 		| [] -> str
 	in
