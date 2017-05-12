@@ -9,7 +9,7 @@ open Gametypes
 open List
 open Level
 
-let dt = 0.05
+let dt = 0.08
 let air_friction_coef = 0.001
 
 (* Computes acceleration for a player given its position and the context *)
