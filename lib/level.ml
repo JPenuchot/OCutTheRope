@@ -95,20 +95,22 @@ let objectPosition o =
 	| Bubble(((x, y), _), _)
 	| Goal(((x, y), _))
 	| Wall(((x, y), _))
-	| Monster(((x, y), _))       -> (int_of_float x, int_of_float y)
+	| Monster(((x, y), _))
+	| RopeMaker(((x, y), _), _)  -> (int_of_float x, int_of_float y)
 	| _                          -> (0, 0)
 
 (* Update the position of a gameObject *)
 let updatePosition o x y =
 	match o with
-	| Player(((_, a), b, c)) -> Player((((x, y), a), b, c))
-	| Star((_, a))           -> Star(((x, y), a))
-	| Attractor(_, a)        -> Attractor((x, y), a)
-	| Bubble((_, a), b)      -> Bubble(((x, y), a), b)
-	| Goal((_, a))           -> Goal(((x, y), a))
-	| Wall((_, a))           -> Wall(((x, y), a))
-	| Monster((_, a))        -> Monster(((x, y), a))
-	| _                      -> o
+	| Player(((_, a), b, c))       -> Player((((x, y), a), b, c))
+	| Star((_, a))                 -> Star(((x, y), a))
+	| Attractor(_, a)              -> Attractor((x, y), a)
+	| Bubble((_, a), b)            -> Bubble(((x, y), a), b)
+	| Goal((_, a))                 -> Goal(((x, y), a))
+	| Wall((_, a))                 -> Wall(((x, y), a))
+	| Monster((_, a))              -> Monster(((x, y), a))
+	| RopeMaker((_, a), (_, b, c)) -> RopeMaker(((x, y), a), ((x, y) ,b, c))
+	| _                            -> o
 
 (* Detect if a point is in an given game object *)
 let pointIsInObject pointX pointY o =
@@ -122,6 +124,7 @@ let pointIsInObject pointX pointY o =
 	| Goal(((x, y), (width, height)))
 	| Wall(((x, y), (width, height)))
 	| Monster(((x, y), (width, height))) -> pX >= x && pX <= (x +. width) && pY >= y && pY <= (y +. height)
+	| RopeMaker(((x, y), radius), _)     -> sqrt((pX-.x)**2. +. (pY-.y)**2.) <= radius
 	| _                                  -> false
 
 (* Remove an object from a level *)
