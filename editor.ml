@@ -220,11 +220,25 @@ let rec removeOutObjects level =
 
 (* Upload a level to the server *)
 let uploadLevel title level =
-	let resp = httpGET ("http://octr.walter.tw/upload.php?level=" ^ (urlencode (level2String level)) ^ "&description=" ^ (urlencode title)) in
-	if ((fst resp) <> 200) then
-		messageBox "Upload level" "An error occured!\nYour level has not been uploaded."
-	else
-		messageBox "Upload level" "Your level has been uploaded!"
+	let level = removeOutObjects level in
+		let isGravity =
+			List.exists (fun e -> match e with | GravField(_) -> true | _ -> false) level
+		in
+		if isGravity then begin
+			let resp = httpGET ("http://octr.walter.tw/upload.php?level=" ^ (urlencode (level2String level)) ^ "&description=" ^ (urlencode title)) in
+			if ((fst resp) <> 200) then
+				messageBox "Upload level" "An error occured!\nYour level has not been uploaded."
+			else
+				messageBox "Upload level" "Your level has been uploaded!";
+		end
+		else begin
+			let resp = httpGET ("http://octr.walter.tw/upload.php?level=" ^ (urlencode (level2String ((GravField(default_grav))::level))) ^ "&description=" ^ (urlencode title)) in
+			if ((fst resp) <> 200) then
+				messageBox "Upload level" "An error occured!\nYour level has not been uploaded."
+			else
+				messageBox "Upload level" "Your level has been uploaded!";
+		end
+	
 
 (* Main function, will be called reccursivly *)
 let rec main level =
