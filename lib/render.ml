@@ -147,9 +147,7 @@ let rec draw_mods p m =
     | []   -> ()
 
 let draw_modifiers p m =
-    fold_left(fun _ lm ->
-        draw_mods p lm
-    ) () (separate_modifiers m)
+    iter(draw_mods p) (separate_modifiers m)
 
 (* Simple function to draw a single element *)
 let draw_single_element element =
@@ -195,11 +193,7 @@ let draw_level_game level sync =
     (* Draw background *)
     draw_image background 0 0;
     (* Internal function to draw the elements of a gameElement list *)
-    fold_left (fun _ lst ->
-        fold_left(fun _ elmt ->
-            draw_single_element elmt
-        ) () lst
-    ) () (separate_elements level);
+    iter (iter draw_single_element) (separate_elements level);
     if sync then synchronize()
 
 
@@ -209,7 +203,5 @@ let draw_level_editor level sync =
     (* Draw background *)
     draw_image background 0 0;
     (* Internal function to draw the elements of a gameElement list *)
-    fold_left (fun _ elmt ->
-        draw_single_element elmt
-    ) () level;
+    iter draw_single_element level;
     if sync then synchronize()
